@@ -16,7 +16,7 @@ function App() {
     <div className="App">
       <Router basename="/Pahadi-Beats">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route exact path="/Pahadi-Beats" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/search" element={<Search />} />
