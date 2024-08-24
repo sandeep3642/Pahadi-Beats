@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/Pahadi-Beats/static/css/main.22e9c8df.css",
-    "main.js": "/Pahadi-Beats/static/js/main.3fe8e053.js",
+    "main.js": "/Pahadi-Beats/static/js/main.8c2a0a39.js",
     "static/js/885.d6d0d567.chunk.js": "/Pahadi-Beats/static/js/885.d6d0d567.chunk.js",
     "static/js/453.ec4f7af5.chunk.js": "/Pahadi-Beats/static/js/453.ec4f7af5.chunk.js",
     "index.html": "/Pahadi-Beats/index.html",
     "main.22e9c8df.css.map": "/Pahadi-Beats/static/css/main.22e9c8df.css.map",
-    "main.3fe8e053.js.map": "/Pahadi-Beats/static/js/main.3fe8e053.js.map",
+    "main.8c2a0a39.js.map": "/Pahadi-Beats/static/js/main.8c2a0a39.js.map",
     "885.d6d0d567.chunk.js.map": "/Pahadi-Beats/static/js/885.d6d0d567.chunk.js.map",
     "453.ec4f7af5.chunk.js.map": "/Pahadi-Beats/static/js/453.ec4f7af5.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.22e9c8df.css",
-    "static/js/main.3fe8e053.js"
+    "static/js/main.8c2a0a39.js"
   ]
 }
