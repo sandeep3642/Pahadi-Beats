@@ -1,7 +1,7 @@
 {
   "name": "movies-flix",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "homepage": "https://sandeep3642.github.io/Pahadi-Beats",
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
