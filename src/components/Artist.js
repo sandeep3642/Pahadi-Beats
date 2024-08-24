@@ -33,7 +33,7 @@ const Artist = () => {
               <div className="relative w-full pb-[100%] bg-[#f1f1f1]">
                 <img
                   src={artist.profilePic || "default-cover-image.jpg"}
-                  alt="Album Cover"
+                  alt="Artist Cover"
                   className="absolute top-0 left-0 w-full h-full object-cover"
                 />
                 <div className="absolute bottom-2 right-2 hidden group-hover:block">
@@ -47,13 +47,13 @@ const Artist = () => {
               </div>
             </div>
             <div className="p-4">
-              <a
-                href="#"
+              <button
+                onClick={() => console.log(`Clicked on artist ${artist.name}`)}
                 className="text-white text-lg"
                 id={`card-title-${artist._id}`}
               >
                 {artist.name}
-              </a>
+              </button>
               <div className="text-gray-400 text-sm">Artist</div>
             </div>
           </div>

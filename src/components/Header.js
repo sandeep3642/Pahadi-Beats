@@ -6,7 +6,7 @@ const avatar = process.env.PUBLIC_URL + "/avatar.png";
 
 const Header = () => {
   const dispatch = useDispatch();
-  const { profile, loading, error } = useSelector((state) => state.profile);
+  const { profile } = useSelector((state) => state.profile);
 
   useEffect(() => {
     dispatch(fetchProfile());

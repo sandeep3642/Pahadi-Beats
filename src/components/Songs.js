@@ -16,7 +16,6 @@ const Songs = () => {
     const fetchSongs = async () => {
       try {
         console.log(currentPage, pageSize);
-        // const response = await fetch(`/api/song/getAllSongs?pageNumber=${currentPage}&pageSize=${pageSize}`);
         const data = await apiHelper(
           `/api/song/getAllSongs?pageNumber=${currentPage}&pageSize=${pageSize}`,
           "GET"
@@ -24,14 +23,6 @@ const Songs = () => {
         console.log(data.data, "All songs");
         setSongs(data.data);
         setTotalPages(Math.ceil(data.pagination.totalSongs / pageSize));         
-        // if (response.ok) {
-        //   const data = await response.json();
-        //   console.log(data.data, "All songs");
-        //   setSongs(data.data);
-        //   setTotalPages(Math.ceil(data.pagination.totalSongs / pageSize)); // Update total pages based on total song count
-        // } else {
-        //   console.error("Failed to fetch songs:", response.statusText);
-        // }
       } catch (error) {
         console.error("Error fetching songs:", error);
       }
@@ -85,13 +76,13 @@ const Songs = () => {
               </div>
             </div>
             <div className="p-4">
-              <a
-                href="#"
+              <button
                 className="text-white text-lg"
                 id={`card-title-${song._id}`}
+                onClick={() => handlePlaySong(song)}
               >
                 {song.title}
-              </a>
+              </button>
               <div className="text-gray-400 text-sm">Song</div>
             </div>
           </div>
