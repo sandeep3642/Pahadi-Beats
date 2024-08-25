@@ -14,7 +14,7 @@ import Otp from "./components/OtpModal";
 function App() {
   return (
     <div className="App">
-      <Router basename="/Pahadi-Beats">
+      <Router>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
