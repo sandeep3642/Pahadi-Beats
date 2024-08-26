@@ -1,8 +1,8 @@
 // src/utils/apiHelper.js
 import axios from 'axios';
 
-// const BASE_URL = 'https://warble-backend-api.onrender.com';
-const BASE_URL ='http://localhost:5000';
+const BASE_URL = 'https://warble-backend-api.onrender.com';
+// const BASE_URL ='http://localhost:5000';
 
 const apiHelper = async (endpoint, method = 'GET',  body = null, headers = {}, params = {}) => {
   try {

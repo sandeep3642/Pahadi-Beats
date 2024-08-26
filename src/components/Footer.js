@@ -47,7 +47,7 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Spotify Plans */}
+        {/*  Plans */}
         <div>
           <p className="text-lg font-bold mb-4">Pahadi Beat Plans</p>
           <ul className="space-y-2">
@@ -89,11 +89,11 @@ const Footer = () => {
             </li>
             <li>
               <a
-                href="https://example.com/spotify-free" // Replace with actual URL
+                href="https://example.com/pahadi-free" // Replace with actual URL
                 className="text-gray-400 hover:text-white"
-                aria-label="Spotify Free"
+                aria-label="Pahadi beats Free"
               >
-                Spotify Free
+                Pahadi Beats Free
               </a>
             </li>
           </ul>
