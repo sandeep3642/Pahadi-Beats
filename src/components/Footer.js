@@ -11,7 +11,7 @@ const Footer = () => {
           <ul className="space-y-2">
             <li>
               <a
-                href="https://example.com/about" // Replace with actual URL
+                href="/about" // Replace with actual URL
                 className="text-gray-400 hover:text-white"
                 aria-label="About"
               >

@@ -10,6 +10,9 @@ import PlayingSong from "./components/PlayingSong";
 import Search from "./components/Search";
 import AllSongs from "./components/AllSongs";
 import Otp from "./components/OtpModal";
+import Profile from "./components/Profile";
+import AboutArtist from "./components/AboutArtist";
+import About from "./components/About";
 
 function App() {
   return (
@@ -22,6 +25,10 @@ function App() {
           <Route path="/search" element={<Search />} />
           <Route path="/allsongs" element={<AllSongs />} />
           <Route path="/otp" element={<Otp />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/aboutArtist/:id" element={<AboutArtist />} /> {/* Corrected route */}
+
           <Route
             path="/playing-song"
             element={

@@ -1,65 +1,51 @@
 import React, { useState, useEffect } from "react";
-import { FaPlay } from "react-icons/fa";
 import apiHelper from "../utils/apiHelper";
+import { Link } from "react-router-dom";
 
 const Artist = () => {
   const [artists, setArtists] = useState([]);
 
   useEffect(() => {
-    const fetchSongs = async () => {
+    const fetchArtists = async () => {
       try {
-        const data = await apiHelper('/api/artist/getAllArtists', 'GET');
-        console.log('Fetched data:', data);
+        const data = await apiHelper("/api/artist/getAllArtists", "GET");
         setArtists(data.data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching artists:", error);
       }
     };
 
-    fetchSongs();
+    fetchArtists();
   }, []);
 
   return (
-    <>
-      <div className="grid grid-cols-[repeat(auto-fill,_minmax(160px,_1fr))] gap-4">
-        {artists.map((artist) => (
-          <div
-            key={artist._id}
-            className="ml-5 bg-[#682828] rounded-lg overflow-hidden transform transition-transform duration-200 hover:scale-105 group"
-            role="group"
-            aria-labelledby={`card-title-${artist._id}`}
-          >
-            <div className="relative p-4">
-              <div className="relative w-full pb-[100%] bg-[#f1f1f1]">
-                <img
-                  src={artist.profilePic || "default-cover-image.jpg"}
-                  alt="Artist Cover"
-                  className="absolute top-0 left-0 w-full h-full object-cover"
-                />
-                <div className="absolute bottom-2 right-2 hidden group-hover:block">
-                  <button
-                    aria-label={`Play ${artist.name}`}
-                    className="bg-purple-1000 rounded-full p-2 cursor-pointer hover:bg-purple-700"
-                  >
-                    <FaPlay className="fill-black  w-6 h-6" />
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="p-4">
-              <button
-                onClick={() => console.log(`Clicked on artist ${artist.name}`)}
-                className="text-white text-lg"
-                id={`card-title-${artist._id}`}
-              >
-                {artist.name}
-              </button>
-              <div className="text-gray-400 text-sm">Artist</div>
-            </div>
+    <div className="flex overflow-x-auto gap-4 p-4">
+      {artists.map((artist) => (
+        <div
+          key={artist._id}
+          className="relative flex flex-col items-center group rounded-full p-2 transition-transform transform hover:scale-105"
+        >
+          {/* Artist Image Container */}
+          <div className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 bg-gray-200 rounded-full overflow-hidden relative">
+            <img
+              src={artist.profilePic || "default-cover-image.jpg"}
+              alt={`Artist ${artist.name}`}
+              className="w-full h-full object-cover"
+            />
           </div>
-        ))}
-      </div>
-    </>
+
+          {/* Background card on hover */}
+          <Link to={`/aboutArtist/${artist._id}`}>
+            <div className="absolute inset-0 bg-gray-500 rounded-full flex flex-col items-center justify-center p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <button aria-label={`View ${artist.name}`} className="text-white">
+                View
+              </button>
+              <span className="text-white mt-2 text-center">{artist.name}</span>
+            </div>
+          </Link>
+        </div>
+      ))}
+    </div>
   );
 };
 

@@ -8,16 +8,26 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Spinner from "./Spinner"; // Import the Spinner component
 import apiHelper from "../utils/apiHelper";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 const logoPath = process.env.PUBLIC_URL + "/PahadiBeats.png";
 
+// Update the validation schema to use the isValidPhoneNumber function
 const validationSchema = Yup.object({
   firstName: Yup.string().required("First Name is required"),
   lastName: Yup.string().required("Last Name is required"),
   email: Yup.string()
     .email("Invalid email address")
     .required("Email is required"),
-  phoneNumber: Yup.string().required("Phone Number is required"),
+  phoneNumber: Yup.string()
+    .required("Phone Number is required")
+    .test(
+      "valid-phone",
+      "Invalid phone number",
+      function (value) {
+        return isValidPhoneNumber(value || "");
+      }
+    ),
   dateOfBirth: Yup.date().required("Date of Birth is required"),
   gender: Yup.string().required("Gender is required"),
   password: Yup.string()
@@ -60,7 +70,6 @@ const Register = () => {
     }
   };
 
-
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       await handleSendOtp(values);
@@ -95,8 +104,9 @@ const Register = () => {
             }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
+            validateOnChange={true} // Ensure validation on change
           >
-            {({ setFieldValue, isSubmitting }) => (
+            {({ setFieldValue, validateField, isSubmitting }) => (
               <Form className="flex flex-col gap-6">
                 {/* Form Fields */}
                 <div className="flex gap-4">
@@ -110,6 +120,10 @@ const Register = () => {
                       name="firstName"
                       placeholder="First Name"
                       className="border border-gray-300 p-3 rounded text-black w-full"
+                      onChange={(e) => {
+                        setFieldValue("firstName", e.target.value);
+                        validateField("firstName");
+                      }}
                     />
                     <ErrorMessage
                       name="firstName"
@@ -127,6 +141,10 @@ const Register = () => {
                       name="lastName"
                       placeholder="Last Name"
                       className="border border-gray-300 p-3 rounded text-black w-full"
+                      onChange={(e) => {
+                        setFieldValue("lastName", e.target.value);
+                        validateField("lastName");
+                      }}
                     />
                     <ErrorMessage
                       name="lastName"
@@ -147,6 +165,10 @@ const Register = () => {
                       name="email"
                       placeholder="Email"
                       className="border border-gray-300 p-3 rounded text-black w-full"
+                      onChange={(e) => {
+                        setFieldValue("email", e.target.value);
+                        validateField("email");
+                      }}
                     />
                     <ErrorMessage
                       name="email"
@@ -166,6 +188,7 @@ const Register = () => {
                       onChange={(value) => {
                         setPhoneNumber(value);
                         setFieldValue("phoneNumber", value);
+                        validateField("phoneNumber");
                       }}
                       className="border border-gray-300 p-3 rounded text-black w-full"
                     />
@@ -188,6 +211,10 @@ const Register = () => {
                       type="date"
                       name="dateOfBirth"
                       className="border border-gray-300 p-3 rounded text-black w-full"
+                      onChange={(e) => {
+                        setFieldValue("dateOfBirth", e.target.value);
+                        validateField("dateOfBirth");
+                      }}
                     />
                     <ErrorMessage
                       name="dateOfBirth"
@@ -204,11 +231,15 @@ const Register = () => {
                       as="select"
                       name="gender"
                       className="border border-gray-300 p-3 rounded text-black w-full"
+                      onChange={(e) => {
+                        setFieldValue("gender", e.target.value);
+                        validateField("gender");
+                      }}
                     >
-                      <option value="" label="Select gender" />
-                      <option value="male" label="Male" />
-                      <option value="female" label="Female" />
-                      <option value="other" label="Other" />
+                      <option value="">Select Gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
                     </Field>
                     <ErrorMessage
                       name="gender"
@@ -230,6 +261,10 @@ const Register = () => {
                       name="password"
                       placeholder="Password"
                       className="border border-gray-300 p-3 rounded text-black w-full"
+                      onChange={(e) => {
+                        setFieldValue("password", e.target.value);
+                        validateField("password");
+                      }}
                     />
                     <ErrorMessage
                       name="password"
@@ -247,6 +282,10 @@ const Register = () => {
                       name="confirmPassword"
                       placeholder="Confirm Password"
                       className="border border-gray-300 p-3 rounded text-black w-full"
+                      onChange={(e) => {
+                        setFieldValue("confirmPassword", e.target.value);
+                        validateField("confirmPassword");
+                      }}
                     />
                     <ErrorMessage
                       name="confirmPassword"
@@ -256,24 +295,27 @@ const Register = () => {
                   </div>
                 </div>
 
-                {/* Register Button */}
+                {/* Submit Button */}
                 <button
                   type="submit"
-                  className="bg-purple-600 text-white px-6 py-3 rounded-lg mt-4"
                   disabled={isSubmitting || isLoading}
+                  className="bg-purple-500 text-white p-3 rounded hover:bg-purple-600"
                 >
-                  Register
+                  {isSubmitting || isLoading ? "Please wait..." : "Register"}
                 </button>
+
+                {/* Link to Login */}
+                <div className="text-center mt-4">
+                  <span className="text-white">
+                    If you already have an account, click on{" "}
+                    <a href="/login" className="text-purple-300 underline">
+                      Login
+                    </a>
+                  </span>
+                </div>
               </Form>
             )}
           </Formik>
-          {/* Redirect to Login Page */}
-          <div className="text-white mt-4">
-            If you already have an account, click on{" "}
-            <a href="/login" className="text-purple-400">
-              Login
-            </a>
-          </div>
         </div>
       </div>
 
@@ -282,15 +324,16 @@ const Register = () => {
         <OtpModal
           isOpen={isOtpModalOpen}
           onClose={() => setIsOtpModalOpen(false)}
+          onVerify={() => console.log("Verified")}
           otpData={otpData}
         />
       )}
 
+      {/* Toast notifications */}
+      <ToastContainer />
+
       {/* Spinner */}
       {isLoading && <Spinner />}
-      
-      {/* Toast Container */}
-      <ToastContainer />
     </div>
   );
 };
