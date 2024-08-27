@@ -11,7 +11,7 @@ export const fetchProfile = createAsyncThunk('profile/fetchProfile', async (_, {
     // Use apiHelper to make the API request
     const data = await apiHelper('/api/user/me', 'GET', null, headers);
 
-    return data.data;  // Return the fetched data
+    return data.data;  // Return the fetched data 
   } catch (error) {
     return rejectWithValue(error.message);
   }

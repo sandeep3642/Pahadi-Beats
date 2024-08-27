@@ -10,7 +10,7 @@ import Spinner from "./Spinner"; // Import the Spinner component
 import apiHelper from "../utils/apiHelper";
 import { isValidPhoneNumber } from "libphonenumber-js";
 
-const logoPath = process.env.PUBLIC_URL + "/PahadiBeats.png";
+const logoPath = process.env.PUBLIC_URL + "/logo1.png";
 
 // Update the validation schema to use the isValidPhoneNumber function
 const validationSchema = Yup.object({

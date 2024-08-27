@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
@@ -7,7 +7,7 @@ import { toast, ToastContainer } from "react-toastify"; // Import toast and Toas
 import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
 import apiHelper from "../utils/apiHelper";
 
-const logoPath = process.env.PUBLIC_URL + '/PahadiBeats.png';
+const logoPath = process.env.PUBLIC_URL + "/logo1.png";
 
 const Login = () => {
   const [loginMethod, setLoginMethod] = useState("email"); // "email" or "phone"
@@ -15,49 +15,112 @@ const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false); // State for loading spinner
+  const [deviceInfo, setDeviceInfo] = useState({}); // State to store device info
+
+  // Function to get device information including location
+  const getDeviceInfo = () => {
+    const info = {
+      browser: navigator.userAgent,
+      device: navigator.userAgentData?.platform || "Unknown Device",
+      latitude: null,
+      longitude: null,
+      location: null,
+    };
+
+    // Check if geolocation is supported
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          info.latitude = position.coords.latitude;
+          info.longitude = position.coords.longitude;
+          console.log("Device Info with Location:", info);
+          setDeviceInfo(info); // Update state with device info
+        },
+        (error) => {
+          console.error("Error getting geolocation:", error);
+         
+        }
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+      toast.error("Geolocation is not supported by this browser."); // Show error toast
+    }
+
+    return info;
+  };
+
+  // Check for location access when the component mounts
+  useEffect(() => {
+    getDeviceInfo(); // Get device info including location
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setIsLoading(true); // Show spinner
 
-    const loginData = loginMethod === "email" ? { email, password } : { phoneNumber, password };
+    const loginData = {
+      ...(loginMethod === "email"
+        ? { email, password }
+        : { phoneNumber, password }),
+      deviceInfo: deviceInfo, // Include device info in login data
+    };
 
     try {
-      // Use apiHelper to handle the login request
-      const response = await apiHelper("/api/user/login", "POST", loginData);
-    
-      if (response.data !== null) {
-        localStorage.setItem("token", response.data.token);
-        toast.success("Login successful!"); // Success toast
-        window.location.href = "/";
-      } else {
-        toast.error(response.error); // Error toast with server message
+      // Check if location data is available
+      if (deviceInfo.latitude != null && deviceInfo.longitude != null) {
+        const response = await apiHelper("/api/user/login", "POST", loginData);
+        if (response && response.status === 200) {
+          localStorage.setItem("token", response.data.token);
+          toast.success(response.message || "Login successful!"); // Success toast
+          window.location.href = "/"; // Redirect to the home page
+        } else {
+          toast.error(
+            response.error ||
+              "An error occurred during login. Please try again."
+          ); // Error toast
+        }
+      }else{
+        toast.error(
+          "Location access denied. Please allow location access and try again."
+        ); // Show error toast
       }
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("An error occurred during login. Please try again." + error); // Generic error toast
+      toast.error("An error occurred during login. Please try again."); // Generic error toast
     } finally {
       setIsLoading(false); // Hide spinner
     }
-    
   };
 
   return (
     <div className="bg-gradient-to-r from-black to-purple-900 min-h-screen flex flex-col justify-center items-center">
       <div className="w-full max-w-md p-8 rounded-lg shadow-lg">
-        <img src={logoPath} alt="Warble Logo" className="w-32 h-32 mx-auto mb-6 rounded-full" />
+        <img
+          src={logoPath}
+          alt="Warble Logo"
+          className="w-32 h-32 mx-auto mb-6 rounded-full"
+        />
         <h1 className="text-2xl font-bold mb-4 text-white">Login</h1>
         <p className="text-white mb-6">Sign In to your account</p>
 
         <div className="flex justify-center mb-4">
           <button
-            className={`text-left px-4 py-2 ${loginMethod === "email" ? "bg-purple-600 text-white" : "bg-gray-800 text-gray-400"} rounded-l-lg`}
+            className={`text-left px-4 py-2 ${
+              loginMethod === "email"
+                ? "bg-purple-600 text-white"
+                : "bg-gray-800 text-gray-400"
+            } rounded-l-lg`}
             onClick={() => setLoginMethod("email")}
           >
             Email
           </button>
           <button
-            className={`text-left px-4 py-2 ${loginMethod === "phone" ? "bg-purple-600 text-white" : "bg-gray-800 text-gray-400"} rounded-r-lg`}
+            className={`text-left px-4 py-2 ${
+              loginMethod === "phone"
+                ? "bg-purple-600 text-white"
+                : "bg-gray-800 text-gray-400"
+            } rounded-r-lg`}
             onClick={() => setLoginMethod("phone")}
           >
             Phone
@@ -103,8 +166,9 @@ const Login = () => {
           <button
             type="submit"
             className="bg-purple-600 text-white px-6 py-3 rounded-lg mt-4"
+            disabled={isLoading} // Disable button when loading
           >
-            Login
+            {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>
 
@@ -117,9 +181,7 @@ const Login = () => {
           </p>
         </div>
       </div>
-
       {isLoading && <Spinner />} {/* Show spinner when loading */}
-
       <ToastContainer /> {/* Add ToastContainer to render toasts */}
     </div>
   );

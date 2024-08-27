@@ -1,8 +1,10 @@
 // src/utils/apiHelper.js
 import axios from 'axios';
+import { toast } from "react-toastify"; // Import toast and ToastContainer from react-toastify
+import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
 
-const BASE_URL = 'https://warble-backend-api.onrender.com';
-// const BASE_URL ='http://localhost:5000';
+// const BASE_URL = 'https://warble-backend-api.onrender.com';
+const BASE_URL ='http://localhost:5000';
 
 const apiHelper = async (endpoint, method = 'GET',  body = null, headers = {}, params = {}) => {
   try {
@@ -36,9 +38,9 @@ const apiHelper = async (endpoint, method = 'GET',  body = null, headers = {}, p
     return response.data;
   } catch (error) {
     // Handle and log errors
-    console.error('API Request failed:', error);
-    if (error.response) {
-      throw new Error(`HTTP error! Status: ${error.response.status}, Message: ${error.response.data.message || error.message}`);
+    console.error('API Request failed:', error?.response?.data?.error);
+    if (error?.response) {
+      toast.error(error?.response?.data?.error); // Error toast with server message
     } else {
       throw new Error(`Network error! ${error.message}`);
     }

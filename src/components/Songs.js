@@ -13,9 +13,9 @@ const Songs = () => {
 
   // Function to determine page size based on screen width
   function getResponsivePageSize() {
-    if (window.innerWidth >= 1280) return 8; // For large screens
-    if (window.innerWidth >= 1024) return 6; // For medium screens
-    if (window.innerWidth >= 768) return 4; // For small screens
+    if (window.innerWidth >= 1280) return 6; // For large screens
+    if (window.innerWidth >= 1024) return 4; // For medium screens
+    if (window.innerWidth >= 768) return 2; // For small screens
     return 2; // For extra small screens
   }
 
@@ -70,7 +70,7 @@ const Songs = () => {
         {songs.map((song) => (
           <div
             key={song._id}
-            className="bg-[#682828] rounded-lg overflow-hidden transform transition-transform duration-200 hover:scale-105 group"
+            className="bg-gray-500 rounded-lg overflow-hidden transform transition-transform duration-200 hover:scale-105 group"
           >
             <div className="relative">
               <img
