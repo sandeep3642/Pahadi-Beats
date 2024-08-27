@@ -3,8 +3,8 @@ import axios from 'axios';
 import { toast } from "react-toastify"; // Import toast and ToastContainer from react-toastify
 import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
 
-// const BASE_URL = 'https://warble-backend-api.onrender.com';
-const BASE_URL ='http://localhost:5000';
+const BASE_URL = 'https://warble-backend-api.onrender.com';
+// const BASE_URL ='http://localhost:5000';
 
 const apiHelper = async (endpoint, method = 'GET',  body = null, headers = {}, params = {}) => {
   try {
