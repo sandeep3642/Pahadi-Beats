@@ -22,11 +22,14 @@ const Header = () => {
     );
     if (confirmed) {
       const token = localStorage.getItem('token');
+      const sessionId = document.cookie.split('; ').find(row => row.startsWith('sessionId=')).split('=')[1]; // Retrieve sessionId from cookies
       const headers = {
         Authorization: `Bearer ${token}`,
+        'sessionId': sessionId // Include sessionId in headers
       };
       const response = await apiHelper("/api/user/logout", "POST", null, headers);
       if (response) {
+        document.cookie = "sessionId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/"; // Clear session ID cookie
         localStorage.removeItem("token");
         window.location.href = "/login";
       }

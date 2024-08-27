@@ -5,8 +5,11 @@ import apiHelper from '../utils/apiHelper'; // Adjust the path based on your pro
 export const fetchProfile = createAsyncThunk('profile/fetchProfile', async (_, { rejectWithValue }) => {
   try {
     const token = localStorage.getItem('token');
+    const sessionId = document.cookie.split('; ').find(row => row.startsWith('sessionId=')).split('=')[1]; // Retrieve sessionId from cookies
+    console.log(sessionId )
     const headers = {
       Authorization: `Bearer ${token}`,
+      'sessionId': sessionId // Include sessionId in headers
     };
     // Use apiHelper to make the API request
     const data = await apiHelper('/api/user/me', 'GET', null, headers);

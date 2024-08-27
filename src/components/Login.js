@@ -56,42 +56,37 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     setIsLoading(true); // Show spinner
-
+  
     const loginData = {
-      ...(loginMethod === "email"
-        ? { email, password }
-        : { phoneNumber, password }),
+      ...(loginMethod === "email" ? { email, password } : { phoneNumber, password }),
       deviceInfo: deviceInfo, // Include device info in login data
     };
-
+  
     try {
-      // Check if location data is available
       if (deviceInfo.latitude != null && deviceInfo.longitude != null) {
         const response = await apiHelper("/api/user/login", "POST", loginData);
+  
         if (response && response.status === 200) {
           localStorage.setItem("token", response.data.token);
-          toast.success(response.message || "Login successful!"); // Success toast
+          document.cookie = `sessionId=${response.data.sessionId}; path=/`; // Store session ID in cookie
+          toast.success(response.message || "Login successful!");
           window.location.href = "/"; // Redirect to the home page
         } else {
-          toast.error(
-            response.error ||
-              "An error occurred during login. Please try again."
-          ); // Error toast
+          toast.error(response.error || "An error occurred during login. Please try again.");
         }
-      }else{
-        toast.error(
-          "Location access denied. Please allow location access and try again."
-        ); // Show error toast
+      } else {
+        toast.error("Location access denied. Please allow location access and try again.");
       }
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("An error occurred during login. Please try again."); // Generic error toast
+      toast.error("An error occurred during login. Please try again.");
     } finally {
       setIsLoading(false); // Hide spinner
     }
   };
+  
 
   return (
     <div className="bg-gradient-to-r from-black to-purple-900 min-h-screen flex flex-col justify-center items-center">
