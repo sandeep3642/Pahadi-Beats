@@ -82,15 +82,15 @@ const Register = () => {
 
   return (
     <div className="bg-gradient-to-r from-grey-900 to-purple-900 min-h-screen flex flex-col justify-center items-center p-4">
-      <div className="flex w-full max-w-4xl rounded-lg shadow-lg p-8">
-        <div className="w-full">
+      <div className="flex flex-col md:flex-row w-full max-w-4xl rounded-lg shadow-lg p-8 bg-white">
+        <div className="w-full md:w-1/2">
           <img
             src={logoPath}
             alt="Warble Logo"
             className="w-32 h-32 mx-auto mb-6 rounded-full"
           />
-          <h1 className="text-3xl font-bold mb-4 text-white">Sign Up</h1>
-          <p className="text-white mb-6">Create your account</p>
+          <h1 className="text-3xl font-bold mb-4 text-black text-center">Sign Up</h1>
+          <p className="text-black mb-6 text-center">Create your account</p>
           <Formik
             initialValues={{
               firstName: "",
@@ -109,10 +109,10 @@ const Register = () => {
             {({ setFieldValue, validateField, isSubmitting }) => (
               <Form className="flex flex-col gap-6">
                 {/* Form Fields */}
-                <div className="flex gap-4">
+                <div className="flex flex-col md:flex-row gap-4">
                   {/* First Name Field */}
-                  <div className="w-1/2">
-                    <label className="text-white block mb-2 text-left">
+                  <div className="w-full md:w-1/2">
+                    <label className="text-black block mb-2 text-left">
                       First Name
                     </label>
                     <Field
@@ -132,8 +132,8 @@ const Register = () => {
                     />
                   </div>
                   {/* Last Name Field */}
-                  <div className="w-1/2">
-                    <label className="text-white block mb-2 text-left">
+                  <div className="w-full md:w-1/2">
+                    <label className="text-black block mb-2 text-left">
                       Last Name
                     </label>
                     <Field
@@ -154,10 +154,10 @@ const Register = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex flex-col md:flex-row gap-4">
                   {/* Email Field */}
-                  <div className="w-1/2">
-                    <label className="text-white block mb-2 text-left">
+                  <div className="w-full md:w-1/2">
+                    <label className="text-black block mb-2 text-left">
                       Email
                     </label>
                     <Field
@@ -177,8 +177,8 @@ const Register = () => {
                     />
                   </div>
                   {/* Phone Number Field */}
-                  <div className="w-1/2">
-                    <label className="text-white block mb-2 text-left">
+                  <div className="w-full md:w-1/2">
+                    <label className="text-black block mb-2 text-left">
                       Phone Number
                     </label>
                     <PhoneInput
@@ -201,10 +201,10 @@ const Register = () => {
                 </div>
 
                 {/* Additional Fields */}
-                <div className="flex gap-4">
+                <div className="flex flex-col md:flex-row gap-4">
                   {/* Date of Birth Field */}
-                  <div className="w-1/2">
-                    <label className="text-white block mb-2 text-left">
+                  <div className="w-full md:w-1/2">
+                    <label className="text-black block mb-2 text-left">
                       Date of Birth
                     </label>
                     <Field
@@ -223,8 +223,8 @@ const Register = () => {
                     />
                   </div>
                   {/* Gender Field */}
-                  <div className="w-1/2">
-                    <label className="text-white block mb-2 text-left">
+                  <div className="w-full md:w-1/2">
+                    <label className="text-black block mb-2 text-left">
                       Gender
                     </label>
                     <Field
@@ -250,10 +250,10 @@ const Register = () => {
                 </div>
 
                 {/* Password Fields */}
-                <div className="flex gap-4">
+                <div className="flex flex-col md:flex-row gap-4">
                   {/* Password Field */}
-                  <div className="w-1/2">
-                    <label className="text-white block mb-2 text-left">
+                  <div className="w-full md:w-1/2">
+                    <label className="text-black block mb-2 text-left">
                       Password
                     </label>
                     <Field
@@ -273,8 +273,8 @@ const Register = () => {
                     />
                   </div>
                   {/* Confirm Password Field */}
-                  <div className="w-1/2">
-                    <label className="text-white block mb-2 text-left">
+                  <div className="w-full md:w-1/2">
+                    <label className="text-black block mb-2 text-left">
                       Confirm Password
                     </label>
                     <Field
@@ -298,17 +298,17 @@ const Register = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  disabled={isSubmitting || isLoading}
-                  className="bg-purple-500 text-white p-3 rounded hover:bg-purple-600"
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg w-full md:w-1/2 mx-auto"
+                  disabled={isSubmitting}
                 >
-                  {isSubmitting || isLoading ? "Please wait..." : "Register"}
+                  {isSubmitting ? "Submitting..." : "Submit"}
                 </button>
 
-                {/* Link to Login */}
+                {/* Login Link */}
                 <div className="text-center mt-4">
-                  <span className="text-white">
-                    If you already have an account, click on{" "}
-                    <a href="/login" className="text-purple-300 underline">
+                  <span className="text-black">
+                    Already have an account?{" "}
+                    <a href="/login" className="text-purple-600 hover:text-purple-800">
                       Login
                     </a>
                   </span>
@@ -317,6 +317,19 @@ const Register = () => {
             )}
           </Formik>
         </div>
+
+        {/* Right Side - Additional Content */}
+        <div className="w-full md:w-1/2 flex flex-col items-center justify-center bg-gradient-to-r from-purple-600 to-purple-800 text-white rounded-lg md:ml-4 mt-4 md:mt-0 p-6">
+          <h2 className="text-2xl font-bold mb-4">Welcome Back!</h2>
+          <p className="text-center mb-4">
+            To keep connected with us, please login with your personal info.
+          </p>
+          <a href="/login">
+            <button className="bg-white text-purple-800 font-bold py-2 px-8 rounded-lg hover:bg-purple-200 transition duration-200">
+              Login
+            </button>
+          </a>
+        </div>
       </div>
 
       {/* OTP Modal */}
@@ -324,12 +337,11 @@ const Register = () => {
         <OtpModal
           isOpen={isOtpModalOpen}
           onClose={() => setIsOtpModalOpen(false)}
-          onVerify={() => console.log("Verified")}
           otpData={otpData}
         />
       )}
 
-      {/* Toast notifications */}
+      {/* Toast Notifications */}
       <ToastContainer />
 
       {/* Spinner */}

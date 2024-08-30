@@ -44,10 +44,8 @@ const OtpModal = ({ isOpen, onClose, otpData }) => {
           );
 
           if (registerResponse.status === 200) {
-            console.log(registerResponse);
-            localStorage.setItem("token", registerResponse.data.token);
             toast.success("Registration successful!"); // Success toast
-            navigate("/");
+            navigate("/login");
           } else {
             toast.error(`Registration failed: ${registerResponse.message}`); // Error toast
           }
@@ -72,8 +70,8 @@ const OtpModal = ({ isOpen, onClose, otpData }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h1 className="text-2xl font-bold mb-6 text-center">
+      <div className="bg-white p-6 md:p-8 rounded-lg shadow-lg max-w-md w-full mx-4 sm:mx-auto"> {/* Adjust padding for smaller screens */}
+        <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center">
           OTP Verification
         </h1>
         <input
@@ -81,15 +79,18 @@ const OtpModal = ({ isOpen, onClose, otpData }) => {
           value={otp}
           onChange={handleOtpChange}
           placeholder="Enter OTP"
-          className="border border-gray-300 p-3 rounded text-black w-full mb-4"
+          className="border border-gray-300 p-3 rounded text-black w-full mb-3 md:mb-4"
         />
         <button
           onClick={handleVerifyOtp}
-          className="bg-purple-600 text-white px-6 py-3 rounded-lg w-full"
+          className="bg-purple-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg w-full"
         >
           Verify OTP
         </button>
-        <button onClick={onClose} className="mt-4 text-purple-600 underline">
+        <button
+          onClick={onClose}
+          className="mt-3 md:mt-4 text-purple-600 underline w-full text-center"
+        >
           Cancel
         </button>
         {isLoading && <Spinner />} {/* Show spinner when loading */}

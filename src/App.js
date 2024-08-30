@@ -13,6 +13,7 @@ import Otp from "./components/OtpModal";
 import Profile from "./components/Profile";
 import AboutArtist from "./components/AboutArtist";
 import About from "./components/About";
+import GoogleAuthCallback from "./components/GoogleAuthCallback";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/about" element={<About />} />
           <Route path="/aboutArtist/:id" element={<AboutArtist />} /> {/* Corrected route */}
+          <Route path="/auth/google/callback" element={<GoogleAuthCallback />} /> {/* Add Google Auth Callback */}
 
           <Route
             path="/playing-song"
