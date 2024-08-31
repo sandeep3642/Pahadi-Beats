@@ -12,6 +12,7 @@ import Profile from "./components/Profile";
 import AboutArtist from "./components/AboutArtist";
 import About from "./components/About";
 import GoogleAuthCallback from "./components/GoogleAuthCallback";
+import Settings from "./components/Setting";
 
 function App() {
   return (
@@ -31,8 +32,16 @@ function App() {
             }
           />
           <Route path="/otp" element={<Otp />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
           <Route path="/about" element={<About />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/aboutArtist/:id" element={<AboutArtist />} />{" "}
           {/* Corrected route */}
           <Route

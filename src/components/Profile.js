@@ -34,12 +34,15 @@ const validationSchema = Yup.object({
 const Profile = () => {
   const dispatch = useDispatch();
   const { profile, loading } = useSelector((state) => state.profile);
-  const [ setIsLoading] = useState(false); // State for spinner
-  const [profilePicPreview, setProfilePicPreview] = useState(profile?.profilePic); // State for profile picture preview
+  const [isLoading, setIsLoading] = useState(false); // Corrected state declaration
+  const [profilePicPreview, setProfilePicPreview] = useState(
+    profile?.profilePic
+  ); // State for profile picture preview
 
   useEffect(() => {
     dispatch(fetchProfile());
   }, [dispatch]);
+
   const handleSubmit = async (values, { setSubmitting }) => {
     setIsLoading(true); // Show spinner
 
@@ -95,6 +98,15 @@ const Profile = () => {
     }
   };
 
+  // Ensure profile object is not null or undefined
+  if (!profile) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spinner />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col md:flex-row">
       <Sidebar />
@@ -111,13 +123,13 @@ const Profile = () => {
               ) : (
                 <Formik
                   initialValues={{
-                    firstName: profile?.firstName || "",
-                    lastName: profile?.lastName || "",
-                    email: profile?.email || "",
-                    phoneNumber: profile?.phoneNumber || "",
-                    dateOfBirth: profile?.dateOfBirth || "",
-                    gender: profile?.gender || "",
-                    profilePic: profile?.profilePic || "", // Ensure profilePic fallback
+                    firstName: profile.firstName || "",
+                    lastName: profile.lastName || "",
+                    email: profile.email || "",
+                    phoneNumber: profile.phoneNumber || "",
+                    dateOfBirth: profile.dateOfBirth || "",
+                    gender: profile.gender || "",
+                    profilePic: profile.profilePic || "", // Ensure profilePic fallback
                   }}
                   validationSchema={validationSchema}
                   onSubmit={handleSubmit}
@@ -163,7 +175,6 @@ const Profile = () => {
                             }
                             className="absolute bottom-0 right-0 "
                           />
-                        
                         </div>
                       </div>
 
@@ -242,17 +253,15 @@ const Profile = () => {
                             Phone Number
                           </label>
                           <Field name="phoneNumber">
-                            {({ field }) => (
+                            {({ field, form }) => (
                               <PhoneInput
-                                {...field}
-                                defaultCountry="US"
-                                international
-                                withCountryCallingCode
+                                placeholder="Phone Number"
                                 className="border border-gray-300 p-3 rounded text-black w-full"
-                                onChange={(value) =>
-                                  setFieldValue("phoneNumber", value)
-                                }
-                                value={profile.phoneNumber}
+                                {...field}
+                                onChange={(value) => {
+                                  form.setFieldValue("phoneNumber", value);
+                                  validateField("phoneNumber");
+                                }}
                               />
                             )}
                           </Field>
@@ -264,7 +273,6 @@ const Profile = () => {
                         </div>
                       </div>
 
-                      {/* DOB and Gender */}
                       <div className="flex flex-col md:flex-row gap-4">
                         {/* Date of Birth Field */}
                         <div className="w-full md:w-1/2">
@@ -286,7 +294,6 @@ const Profile = () => {
                             className="text-red-500 mt-1"
                           />
                         </div>
-
                         {/* Gender Field */}
                         <div className="w-full md:w-1/2">
                           <label className="text-white block mb-2 text-left">
@@ -302,9 +309,9 @@ const Profile = () => {
                             }}
                           >
                             <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
                           </Field>
                           <ErrorMessage
                             name="gender"
@@ -314,17 +321,14 @@ const Profile = () => {
                         </div>
                       </div>
 
-                      <div className="flex justify-center mt-4">
-                        <button
-                          type="submit"
-                          disabled={isSubmitting}
-                          className={`bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded ${
-                            isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                          }`}
-                        >
-                          {isSubmitting ? "Submitting..." : "Update Profile"}
-                        </button>
-                      </div>
+                      {/* Update Profile Button */}
+                      <button
+                        type="submit"
+                        className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+                        disabled={isSubmitting}
+                      >
+                        Update Profile
+                      </button>
                     </Form>
                   )}
                 </Formik>
