@@ -6,7 +6,6 @@ export const fetchProfile = createAsyncThunk('profile/fetchProfile', async (_, {
   try {
     const token = localStorage.getItem('token');
     const sessionId = document.cookie.split('; ').find(row => row.startsWith('sessionId=')).split('=')[1]; // Retrieve sessionId from cookies
-    console.log(sessionId )
     const headers = {
       Authorization: `Bearer ${token}`,
       'sessionId': sessionId // Include sessionId in headers

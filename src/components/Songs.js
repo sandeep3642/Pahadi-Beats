@@ -49,7 +49,7 @@ const Songs = () => {
   }, []);
 
   const handlePlaySong = (song) => {
-    navigate("/playing-song", { state: { song } });
+    navigate("/allsongs");
   };
 
   const handleNextPage = () => {

@@ -37,7 +37,7 @@ const Home = () => {
         {/* Content area */}
         <div className="flex-1 p-4 sm:p-6 text-white">
           {/* Content sections */}
-          <Header/>
+          <Header />
           <SectionWithLink title="Popular Artist" linkTo="/allartists">
             <Artist />
           </SectionWithLink>
@@ -62,7 +62,10 @@ const SectionWithLink = ({ title, linkTo, children }) => (
   <div className="mt-4 sm:mt-6">
     <div className="flex justify-between items-center mb-4 sm:mb-6">
       <h2 className="text-lg sm:text-2xl font-semibold">{title}</h2>
-      <Link to={linkTo} className="text-purple-500 hover:underline text-sm sm:text-base">
+      <Link
+        to={linkTo}
+        className="text-purple-500 hover:underline text-sm sm:text-base"
+      >
         Show all
       </Link>
     </div>
