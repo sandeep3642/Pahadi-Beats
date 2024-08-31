@@ -1,132 +1,86 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
+import { FaTimes, FaHome, FaUser, FaCog, FaSearch, FaSignOutAlt } from "react-icons/fa";
+import { showConfirmDialog } from "../utils/confirmDialog";
+import apiHelper from "../utils/apiHelper";
 
 const logoPath = process.env.PUBLIC_URL + "/logo1.png";
 
-const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
+const Sidebar = ({ isOpen, toggleSidebar }) => {
+  const handleLogout = async () => {
+    const confirmed = await showConfirmDialog(
+      'Logout Confirmation',
+      'Are you sure you want to logout?'
+    );
+    if (confirmed) {
+      const token = localStorage.getItem('token');
+      const sessionId = document.cookie.split('; ').find(row => row.startsWith('sessionId=')).split('=')[1];
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        'sessionId': sessionId
+      };
+      const response = await apiHelper("/api/user/logout", "POST", null, headers);
+      if (response) {
+        document.cookie = "sessionId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+      }
+    }
   };
 
   return (
-    <div className="bg-black text-white min-h-screen flex flex-col">
-      {/* Toggle button for mobile view */}
-      <div className="bg-black px-4 py-2 flex justify-between items-center md:hidden">
-        <button
-          className="text-white focus:outline-none"
-          onClick={toggleMenu}
-          aria-controls="menu"
-          aria-expanded={isOpen}
-        >
-          <span className="sr-only">Toggle Menu</span>
-          {/* Icon for the toggle button */}
-          {isOpen ? (
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              ></path>
-            </svg>
-          ) : (
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16m-7 6h7"
-              ></path>
-            </svg>
-          )}
-        </button>
-      </div>
-
-      {/* Sidebar Content */}
-      {isOpen && (
-        <div className="flex flex-col items-center mt-6 md:block">
-          <img src={logoPath} alt="Warble Logo" className="w-32 h-32 mb-6" />
-          <ul className="space-y-5">
-            <li>
-              <Link to="/" className="text-lg hover:underline">
-                Home
+    <aside
+      className={`fixed inset-y-0 left-0 z-50 w-64 bg-black text-white transform transition-transform duration-300 ease-in-out ${
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      } md:relative md:translate-x-0`}
+    >
+      <div className="flex flex-col h-full">
+        <div className="relative p-4">
+          <div className="flex justify-center">
+            <img src={logoPath} alt="Warble Logo" className="w-32 h-32" />
+          </div>
+          <button
+            onClick={toggleSidebar}
+            className="absolute top-4 right-4 text-white focus:outline-none md:hidden"
+            aria-label="Close sidebar"
+          >
+            <FaTimes size={24} />
+          </button>
+        </div>
+        <nav className="flex-1 overflow-y-auto">
+          <ul className="space-y-5 p-4 flex flex-col items-center">
+            <li className="w-full">
+              <Link to="/" className="text-lg hover:underline flex items-center justify-center w-full">
+                <FaHome className="mr-2" /> Home
               </Link>
             </li>
-            <li>
-              <Link to="/profile" className="text-lg hover:underline">
-                Profile
+            <li className="w-full">
+              <Link to="/profile" className="text-lg hover:underline flex items-center justify-center w-full">
+                <FaUser className="mr-2" /> Profile
               </Link>
             </li>
-            <li>
-              <Link to="/settings" className="text-lg hover:underline">
-                Settings
+            <li className="w-full">
+              <Link to="/settings" className="text-lg hover:underline flex items-center justify-center w-full">
+                <FaCog className="mr-2" /> Settings
               </Link>
             </li>
-            <li>
-              <Link to="/search" className="text-lg hover:underline">
-                Search
+            <li className="w-full">
+              <Link to="/search" className="text-lg hover:underline flex items-center justify-center w-full">
+                <FaSearch className="mr-2" /> Search
               </Link>
+            </li>
+            <li className="w-full">
+              <button
+                onClick={handleLogout}
+                className="text-white py-2 px-4 rounded font-bold flex items-center justify-center w-full"
+              >
+                <FaSignOutAlt className="mr-2" /> Logout
+              </button>
             </li>
           </ul>
-        </div>
-      )}
-
-      {/* Toggle Button for Desktop */}
-      <div className="hidden md:flex justify-center mt-4">
-        <button
-          className="text-white focus:outline-none"
-          onClick={toggleMenu}
-          aria-controls="menu"
-          aria-expanded={isOpen}
-        >
-          {isOpen ? (
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              ></path>
-            </svg>
-          ) : (
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16m-7 6h7"
-              ></path>
-            </svg>
-          )}
-        </button>
+        </nav>
       </div>
-    </div>
+    </aside>
   );
 };
 

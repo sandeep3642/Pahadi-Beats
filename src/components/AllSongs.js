@@ -11,7 +11,7 @@ const AllSongs = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [playlist, setPlaylist] = useState([]); // Initialize playlist state
+  const [playlist, setPlaylist] = useState([]);
   const navigate = useNavigate();
   const pageSize = 10;
 
@@ -19,21 +19,9 @@ const AllSongs = () => {
     const fetchSongs = async () => {
       setLoading(true);
       try {
-        // const response = await fetch(
-        //   `/api/song/getAllSongs?pageNumber=${currentPage}&pageSize=${pageSize}`
-        // );
-        const data = await apiHelper(`/api/song/getAllSongs?pageNumber=${currentPage}&pageSize=${pageSize}`, 'GET')
+        const data = await apiHelper(`/api/song/getAllSongs?pageNumber=${currentPage}&pageSize=${pageSize}`, 'GET');
         setSongs(data.data);
         setTotalPages(Math.ceil(data.pagination.totalSongs / pageSize));
-        // if (response.ok) {
-        //   console.log(response,">>>>>>>>>>>>>")
-        //   const data = await response.json();
-        //   console.log(data,"Sngs>>>>>>>>>")
-        //   setSongs(data.data);
-        //   setTotalPages(Math.ceil(data.pagination.totalSongs / pageSize));
-        // } else {
-        //   console.error("Failed to fetch songs:", response.statusText);
-        // }
       } catch (error) {
         console.error("Error fetching songs:", error);
       } finally {
@@ -42,17 +30,9 @@ const AllSongs = () => {
     };
 
     const fetchPlaylist = async () => {
-      // Example fetch for playlist, replace with actual API endpoint
       try {
-        // const response = await fetch('/api/playlist/getPlaylist');
-        const data = await apiHelper('/api/playlist/getPlaylist', 'GET')
+        const data = await apiHelper('/api/playlist/getPlaylist', 'GET');
         setPlaylist(data.playlist);
-
-        // if (response.ok) {
-        //   const data = await response.json();
-        // } else {
-        //   console.error("Failed to fetch playlist:", response.statusText);
-        // }
       } catch (error) {
         console.error("Error fetching playlist:", error);
       }
@@ -63,7 +43,7 @@ const AllSongs = () => {
   }, [currentPage]);
 
   const handlePlaySong = (song) => {
-    navigate("/playing-song", { state: { song, playlist } });
+    navigate("/playing-song", { state: { song, playlist, currentSongIndex: songs.findIndex(s => s._id === song._id) } });
   };
 
   const handleNextPage = () => {
