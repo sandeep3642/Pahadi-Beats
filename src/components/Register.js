@@ -3,53 +3,48 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
-import OtpModal from "./OtpModal"; // Import the OTP modal component
+import OtpModal from "./OtpModal";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Spinner from "./Spinner"; // Import the Spinner component
+import Spinner from "./Spinner";
 import apiHelper from "../utils/apiHelper";
 import { isValidPhoneNumber } from "libphonenumber-js";
+import { useSearchParams } from "react-router-dom"; // Import useSearchParams from react-router-dom
 
 const logoPath = process.env.PUBLIC_URL + "/logo1.png";
 
-// Update the validation schema to use the isValidPhoneNumber function
+// Validation schema using Yup
 const validationSchema = Yup.object({
   firstName: Yup.string().required("First Name is required"),
   lastName: Yup.string().required("Last Name is required"),
-  email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required"),
+  email: Yup.string().email("Invalid email address").required("Email is required"),
   phoneNumber: Yup.string()
     .required("Phone Number is required")
-    .test(
-      "valid-phone",
-      "Invalid phone number",
-      function (value) {
-        return isValidPhoneNumber(value || "");
-      }
-    ),
+    .test("valid-phone", "Invalid phone number", function (value) {
+      return isValidPhoneNumber(value || "");
+    }),
   dateOfBirth: Yup.date().required("Date of Birth is required"),
   gender: Yup.string().required("Gender is required"),
-  password: Yup.string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
+  password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password"), null], "Passwords must match")
     .required("Confirm Password is required"),
+  referralCode: Yup.string(), // Referral code is optional
 });
 
 const Register = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
   const [otpData, setOtpData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); // State for spinner
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchParams] = useSearchParams(); // useSearchParams hook to get URL parameters
+
+  const referralCodeFromUrl = searchParams.get("referralCode") || ""; // Retrieve the referral code from the URL
 
   const handleSendOtp = async (values) => {
-    setIsLoading(true); // Show spinner
+    setIsLoading(true);
     try {
       const { email, phoneNumber } = values;
-
-      // Use apiHelper to send OTP
       const response = await apiHelper("/api/user/generateOtp", "POST", {
         email,
         phoneNumber,
@@ -59,38 +54,29 @@ const Register = () => {
       if (response.status === 200) {
         setOtpData(values);
         setIsOtpModalOpen(true);
-        toast.success("OTP sent successfully!"); // Show success toast
+        toast.success("OTP sent successfully!");
       } else {
-        toast.error(`Error sending OTP: ${response.message}`); // Show error toast
+        toast.error(`Error sending OTP: ${response.message}`);
       }
     } catch (error) {
-      toast.error(`Error sending OTP: ${error.message}`); // Show error toast
+      toast.error(`Error sending OTP: ${error.message}`);
     } finally {
-      setIsLoading(false); // Hide spinner
+      setIsLoading(false);
     }
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
-    try {
-      await handleSendOtp(values);
-    } catch (error) {
-      toast.error(`Registration error: ${error.message}`); // Show error toast
-    } finally {
-      setSubmitting(false);
-    }
+    await handleSendOtp(values);
+    setSubmitting(false);
   };
 
   return (
-    <div className="bg-gradient-to-r from-grey-900 to-purple-900 min-h-screen flex flex-col justify-center items-center p-4">
-      <div className="flex flex-col md:flex-row w-full max-w-4xl rounded-lg shadow-lg p-8 bg-white">
-        <div className="w-full md:w-1/2">
-          <img
-            src={logoPath}
-            alt="Warble Logo"
-            className="w-32 h-32 mx-auto mb-6 rounded-full"
-          />
-          <h1 className="text-3xl font-bold mb-4 text-black text-center">Sign Up</h1>
-          <p className="text-black mb-6 text-center">Create your account</p>
+    <div className="min-h-screen flex flex-col justify-center items-center p-4 bg-gradient-to-r from-gray-900 to-purple-900">
+      <div className="flex flex-col md:flex-row w-full max-w-4xl rounded-lg shadow-lg bg-gray-500">
+        {/* Left Panel - Registration Form */}
+        <div className="w-full md:w-1/2 p-6">
+          <img src={logoPath} alt="Warble Logo" className="w-32 h-32 mx-auto mb-4" />
+          <h1 className="text-3xl font-bold mb-4 text-black text-center">"Discover, Listen, Enjoy—Join Us Today!"</h1>
           <Formik
             initialValues={{
               firstName: "",
@@ -101,204 +87,117 @@ const Register = () => {
               gender: "",
               password: "",
               confirmPassword: "",
+              referralCode: referralCodeFromUrl, // Prefill referral code from URL
             }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
-            validateOnChange={true} // Ensure validation on change
+            validateOnChange={true}
           >
             {({ setFieldValue, validateField, isSubmitting }) => (
-              <Form className="flex flex-col gap-6">
-                {/* Form Fields */}
-                <div className="flex flex-col md:flex-row gap-4">
-                  {/* First Name Field */}
-                  <div className="w-full md:w-1/2">
+              <Form className="flex flex-col gap-4">
+                {/* Input Fields */}
+                {[
+                  { name: "firstName", type: "text", placeholder: "First Name" },
+                  { name: "lastName", type: "text", placeholder: "Last Name" },
+                  { name: "email", type: "email", placeholder: "Email" },
+                  { name: "dateOfBirth", type: "date", placeholder: "Date of Birth" },
+                ].map(({ name, type, placeholder }) => (
+                  <div key={name}>
                     <label className="text-black block mb-2 text-left">
-                      First Name
+                      {placeholder} *
                     </label>
                     <Field
-                      type="text"
-                      name="firstName"
-                      placeholder="First Name"
+                      type={type}
+                      name={name}
+                      placeholder={placeholder}
                       className="border border-gray-300 p-3 rounded text-black w-full"
                       onChange={(e) => {
-                        setFieldValue("firstName", e.target.value);
-                        validateField("firstName");
+                        setFieldValue(name, e.target.value);
+                        validateField(name);
                       }}
                     />
-                    <ErrorMessage
-                      name="firstName"
-                      component="div"
-                      className="text-red-500 mt-1"
-                    />
+                    <ErrorMessage name={name} component="div" className="text-red-500 mt-1" />
                   </div>
-                  {/* Last Name Field */}
-                  <div className="w-full md:w-1/2">
-                    <label className="text-black block mb-2 text-left">
-                      Last Name
-                    </label>
-                    <Field
-                      type="text"
-                      name="lastName"
-                      placeholder="Last Name"
-                      className="border border-gray-300 p-3 rounded text-black w-full"
-                      onChange={(e) => {
-                        setFieldValue("lastName", e.target.value);
-                        validateField("lastName");
-                      }}
-                    />
-                    <ErrorMessage
-                      name="lastName"
-                      component="div"
-                      className="text-red-500 mt-1"
-                    />
-                  </div>
+                ))}
+
+                {/* Phone Number Input */}
+                <div>
+                  <label className="text-black block mb-2 text-left">Phone Number *</label>
+                  <PhoneInput
+                    international
+                    defaultCountry="IN"
+                    value={phoneNumber}
+                    onChange={(value) => {
+                      setPhoneNumber(value);
+                      setFieldValue("phoneNumber", value);
+                      validateField("phoneNumber");
+                    }}
+                    className="border border-gray-300 p-3 rounded text-black w-full"
+                  />
+                  <ErrorMessage name="phoneNumber" component="div" className="text-red-500 mt-1" />
                 </div>
 
-                <div className="flex flex-col md:flex-row gap-4">
-                  {/* Email Field */}
-                  <div className="w-full md:w-1/2">
-                    <label className="text-black block mb-2 text-left">
-                      Email
-                    </label>
-                    <Field
-                      type="email"
-                      name="email"
-                      placeholder="Email"
-                      className="border border-gray-300 p-3 rounded text-black w-full"
-                      onChange={(e) => {
-                        setFieldValue("email", e.target.value);
-                        validateField("email");
-                      }}
-                    />
-                    <ErrorMessage
-                      name="email"
-                      component="div"
-                      className="text-red-500 mt-1"
-                    />
-                  </div>
-                  {/* Phone Number Field */}
-                  <div className="w-full md:w-1/2">
-                    <label className="text-black block mb-2 text-left">
-                      Phone Number
-                    </label>
-                    <PhoneInput
-                      international
-                      defaultCountry="IN"
-                      value={phoneNumber}
-                      onChange={(value) => {
-                        setPhoneNumber(value);
-                        setFieldValue("phoneNumber", value);
-                        validateField("phoneNumber");
-                      }}
-                      className="border border-gray-300 p-3 rounded text-black w-full"
-                    />
-                    <ErrorMessage
-                      name="phoneNumber"
-                      component="div"
-                      className="text-red-500 mt-1"
-                    />
-                  </div>
-                </div>
-
-                {/* Additional Fields */}
-                <div className="flex flex-col md:flex-row gap-4">
-                  {/* Date of Birth Field */}
-                  <div className="w-full md:w-1/2">
-                    <label className="text-black block mb-2 text-left">
-                      Date of Birth
-                    </label>
-                    <Field
-                      type="date"
-                      name="dateOfBirth"
-                      className="border border-gray-300 p-3 rounded text-black w-full"
-                      onChange={(e) => {
-                        setFieldValue("dateOfBirth", e.target.value);
-                        validateField("dateOfBirth");
-                      }}
-                    />
-                    <ErrorMessage
-                      name="dateOfBirth"
-                      component="div"
-                      className="text-red-500 mt-1"
-                    />
-                  </div>
-                  {/* Gender Field */}
-                  <div className="w-full md:w-1/2">
-                    <label className="text-black block mb-2 text-left">
-                      Gender
-                    </label>
-                    <Field
-                      as="select"
-                      name="gender"
-                      className="border border-gray-300 p-3 rounded text-black w-full"
-                      onChange={(e) => {
-                        setFieldValue("gender", e.target.value);
-                        validateField("gender");
-                      }}
-                    >
-                      <option value="">Select Gender</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                    </Field>
-                    <ErrorMessage
-                      name="gender"
-                      component="div"
-                      className="text-red-500 mt-1"
-                    />
-                  </div>
+                {/* Gender Input */}
+                <div>
+                  <label className="text-black block mb-2 text-left">Gender *</label>
+                  <Field
+                    as="select"
+                    name="gender"
+                    className="border border-gray-300 p-3 rounded text-black w-full"
+                    onChange={(e) => {
+                      setFieldValue("gender", e.target.value);
+                      validateField("gender");
+                    }}
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </Field>
+                  <ErrorMessage name="gender" component="div" className="text-red-500 mt-1" />
                 </div>
 
                 {/* Password Fields */}
-                <div className="flex flex-col md:flex-row gap-4">
-                  {/* Password Field */}
-                  <div className="w-full md:w-1/2">
+                {[
+                  { name: "password", type: "password", placeholder: "Password" },
+                  { name: "confirmPassword", type: "password", placeholder: "Confirm Password" },
+                ].map(({ name, type, placeholder }) => (
+                  <div key={name}>
                     <label className="text-black block mb-2 text-left">
-                      Password
+                      {placeholder} *
                     </label>
                     <Field
-                      type="password"
-                      name="password"
-                      placeholder="Password"
+                      type={type}
+                      name={name}
+                      placeholder={placeholder}
                       className="border border-gray-300 p-3 rounded text-black w-full"
                       onChange={(e) => {
-                        setFieldValue("password", e.target.value);
-                        validateField("password");
+                        setFieldValue(name, e.target.value);
+                        validateField(name);
                       }}
                     />
-                    <ErrorMessage
-                      name="password"
-                      component="div"
-                      className="text-red-500 mt-1"
-                    />
+                    <ErrorMessage name={name} component="div" className="text-red-500 mt-1" />
                   </div>
-                  {/* Confirm Password Field */}
-                  <div className="w-full md:w-1/2">
-                    <label className="text-black block mb-2 text-left">
-                      Confirm Password
-                    </label>
-                    <Field
-                      type="password"
-                      name="confirmPassword"
-                      placeholder="Confirm Password"
-                      className="border border-gray-300 p-3 rounded text-black w-full"
-                      onChange={(e) => {
-                        setFieldValue("confirmPassword", e.target.value);
-                        validateField("confirmPassword");
-                      }}
-                    />
-                    <ErrorMessage
-                      name="confirmPassword"
-                      component="div"
-                      className="text-red-500 mt-1"
-                    />
-                  </div>
+                ))}
+
+                {/* Referral Code Input */}
+                <div>
+                  <label className="text-black block mb-2 text-left">Referral Code</label>
+                  <Field
+                    type="text"
+                    name="referralCode"
+                    placeholder="Referral Code (optional)"
+                    className="border border-gray-300 p-3 rounded text-black w-full"
+                    onChange={(e) => {
+                      setFieldValue("referralCode", e.target.value);
+                    }}
+                  />
                 </div>
 
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg w-full md:w-1/2 mx-auto"
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg w-full mt-4"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? "Submitting..." : "Submit"}
@@ -318,34 +217,25 @@ const Register = () => {
           </Formik>
         </div>
 
-        {/* Right Side - Additional Content */}
-        <div className="w-full md:w-1/2 flex flex-col items-center justify-center bg-gradient-to-r from-purple-600 to-purple-800 text-white rounded-lg md:ml-4 mt-4 md:mt-0 p-6">
-          <h2 className="text-2xl font-bold mb-4">Welcome Back!</h2>
-          <p className="text-center mb-4">
-            To keep connected with us, please login with your personal info.
+        {/* Right Panel - Welcome Message */}
+        <div className="w-full md:w-1/2 p-6 flex flex-col justify-center items-center bg-gray-200 rounded-lg">
+          <h2 className="text-2xl font-semibold mb-4 text-black">Welcome to Warble!</h2>
+          <p className="text-black text-center mb-6">
+            Your journey to discovering amazing music begins here. Create an account and start exploring today!
           </p>
           <a href="/login">
-            <button className="bg-white text-purple-800 font-bold py-2 px-8 rounded-lg hover:bg-purple-200 transition duration-200">
+            <button className="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg hover:shadow-xl">
               Login
             </button>
           </a>
         </div>
       </div>
-
+      {/* Spinner Component */}
+      {isLoading && <Spinner />}
       {/* OTP Modal */}
-      {isOtpModalOpen && (
-        <OtpModal
-          isOpen={isOtpModalOpen}
-          onClose={() => setIsOtpModalOpen(false)}
-          otpData={otpData}
-        />
-      )}
-
+      {isOtpModalOpen && <OtpModal isOpen={isOtpModalOpen} setIsOpen={setIsOtpModalOpen} otpData={otpData} />}
       {/* Toast Notifications */}
       <ToastContainer />
-
-      {/* Spinner */}
-      {isLoading && <Spinner />}
     </div>
   );
 };

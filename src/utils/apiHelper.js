@@ -1,18 +1,30 @@
 // src/utils/apiHelper.js
 import axios from 'axios';
-import { toast } from "react-toastify"; // Import toast and ToastContainer from react-toastify
-import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const BASE_URL = window.location.hostname.includes('localhost')
-? 'http://localhost:5000'  // Use local backend for development
-: 'https://warble-backend-api.onrender.com';  // Use production backend
+  ? 'http://localhost:5000'  // Use local backend for development
+  : 'https://warble-backend-api.onrender.com';  // Use production backend
 
-const apiHelper = async (endpoint, method = 'GET',  body = null, headers = {}, params = {}) => {
+const apiHelper = async (endpoint, method = 'GET', body = null, additionalHeaders = {}, params = {}) => {
   try {
+    // Ensure the method is a string and convert it to uppercase
+    method = typeof method === 'string' ? method.toUpperCase() : 'GET';
+
+    // Retrieve token and sessionId
+    const token = localStorage.getItem('token');
+    const sessionId = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('sessionId='))
+      ?.split('=')[1];
+      
     // Set up default headers
     const defaultHeaders = {
-      'Content-Type': 'application/json',
-      ...headers,
+      'Content-Type': body instanceof FormData ? 'multipart/form-data' : 'application/json',
+      Authorization: `Bearer ${token}`,
+      sessionId: sessionId,
+      ...additionalHeaders,
     };
 
     // Configure Axios request options
@@ -39,12 +51,13 @@ const apiHelper = async (endpoint, method = 'GET',  body = null, headers = {}, p
     return response.data;
   } catch (error) {
     // Handle and log errors
-    console.error('API Request failed:', error?.response?.data?.error);
+    console.error('API Request failed:', error?.response?.data?.error || error.message);
     if (error?.response) {
-      toast.error(error?.response?.data?.error); // Error toast with server message
+      toast.error(error?.response?.data?.error || "An error occurred."); // Error toast with server message
     } else {
-      throw new Error(`Network error! ${error.message}`);
+      toast.error(`Network error! ${error.message}`); // Error toast with network message
     }
+    throw error; // Re-throw the error after handling
   }
 };
 

@@ -13,6 +13,8 @@ import AboutArtist from "./components/AboutArtist";
 import About from "./components/About";
 import GoogleAuthCallback from "./components/GoogleAuthCallback";
 import Settings from "./components/Setting";
+import ForgetPassword from "./components/ForgetPassword";
+import ResetPasswordPage from "./components/ResetPasswordPage";
 
 function App() {
   return (
@@ -41,9 +43,10 @@ function App() {
             }
           />
           <Route path="/about" element={<About />} />
+          <Route path="/forgot-password" element={<ForgetPassword />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/aboutArtist/:id" element={<AboutArtist />} />{" "}
-          {/* Corrected route */}
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route
             path="/auth/google/callback"
             element={<GoogleAuthCallback />}

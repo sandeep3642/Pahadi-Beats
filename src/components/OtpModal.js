@@ -40,6 +40,7 @@ const OtpModal = ({ isOpen, onClose, otpData }) => {
               lastName: otpData.lastName,
               dateOfBirth: otpData.dateOfBirth,
               gender: otpData.gender,
+              referralCode:otpData.referralCode
             }
           );
 

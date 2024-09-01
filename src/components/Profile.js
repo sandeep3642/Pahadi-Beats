@@ -34,17 +34,64 @@ const validationSchema = Yup.object({
 const Profile = () => {
   const dispatch = useDispatch();
   const { profile, loading } = useSelector((state) => state.profile);
-  const [isLoading, setIsLoading] = useState(false); // Corrected state declaration
+  // const [isLoading, setIsLoading] = useState(false);
   const [profilePicPreview, setProfilePicPreview] = useState(
     profile?.profilePic
-  ); // State for profile picture preview
+  );
 
   useEffect(() => {
     dispatch(fetchProfile());
   }, [dispatch]);
 
+  const resizeImage = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+
+          // Calculate new dimensions while maintaining aspect ratio
+          if (width > height) {
+            if (width > 800) {
+              height = Math.round((height * 800) / width);
+              width = 800;
+            }
+          } else {
+            if (height > 800) {
+              width = Math.round((width * 800) / height);
+              height = 800;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob(
+            (blob) => {
+              resolve(
+                new File([blob], file.name, {
+                  type: "image/jpeg",
+                  lastModified: Date.now(),
+                })
+              );
+            },
+            "image/jpeg",
+            0.7
+          ); // Adjust quality here (0.7 = 70% quality)
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleSubmit = async (values, { setSubmitting }) => {
-    setIsLoading(true); // Show spinner
+    // setIsLoading(true);
 
     const changedValues = {};
     Object.keys(values).forEach((key) => {
@@ -55,29 +102,33 @@ const Profile = () => {
 
     if (Object.keys(changedValues).length === 0) {
       toast.info("No changes to update.");
-      setIsLoading(false); // Hide spinner
+      // setIsLoading(false);
       setSubmitting(false);
       return;
     }
 
     const formData = new FormData();
-    Object.keys(changedValues).forEach((key) => {
-      formData.append(key, changedValues[key]);
-    });
+    for (const key in changedValues) {
+      if (key === "profilePic" && changedValues[key]) {
+        const resizedImage = await resizeImage(changedValues[key]);
+        formData.append(key, resizedImage);
+      } else {
+        formData.append(key, changedValues[key]);
+      }
+    }
 
     try {
       const token = localStorage.getItem("token");
       const sessionId = document.cookie
         .split("; ")
         .find((row) => row.startsWith("sessionId="))
-        .split("=")[1]; // Retrieve sessionId from cookies
+        .split("=")[1];
       const headers = {
         Authorization: `Bearer ${token}`,
-        sessionId: sessionId, // Include sessionId in headers
+        sessionId: sessionId,
         "Content-Type": "multipart/form-data",
       };
 
-      // Use apiHelper to update user profile
       const response = await apiHelper(
         "/api/user/update",
         "POST",
@@ -86,19 +137,18 @@ const Profile = () => {
       );
 
       if (response.status === 200) {
-        toast.success("Profile updated successfully!"); // Show success toast
+        toast.success("Profile updated successfully!");
       } else {
-        toast.error(`Error updating profile: ${response.message}`); // Show error toast
+        toast.error(`Error updating profile: ${response.message}`);
       }
     } catch (error) {
-      toast.error(`Error updating profile: ${error.message}`); // Show error toast
+      toast.error(`Error updating profile: ${error.message}`);
     } finally {
-      setIsLoading(false); // Hide spinner
+      // setIsLoading(false);
       setSubmitting(false);
     }
   };
 
-  // Ensure profile object is not null or undefined
   if (!profile) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -119,7 +169,7 @@ const Profile = () => {
                 Edit Profile
               </h1>
               {loading ? (
-                <Spinner /> // Show spinner while loading profile data
+                <Spinner />
               ) : (
                 <Formik
                   initialValues={{
@@ -129,7 +179,7 @@ const Profile = () => {
                     phoneNumber: profile.phoneNumber || "",
                     dateOfBirth: profile.dateOfBirth || "",
                     gender: profile.gender || "",
-                    profilePic: profile.profilePic || "", // Ensure profilePic fallback
+                    profilePic: profile.profilePic || "",
                   }}
                   validationSchema={validationSchema}
                   onSubmit={handleSubmit}
@@ -147,13 +197,16 @@ const Profile = () => {
                             type="file"
                             name="profilePic"
                             accept="image/*"
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               const file = e.target.files[0];
-                              setFieldValue("profilePic", file);
-                              setProfilePicPreview(URL.createObjectURL(file)); // Update preview state
+                              const resizedFile = await resizeImage(file);
+                              setFieldValue("profilePic", resizedFile);
+                              setProfilePicPreview(
+                                URL.createObjectURL(resizedFile)
+                              );
                             }}
                             className="text-white"
-                            style={{ display: "none" }} // Hide the default input
+                            style={{ display: "none" }}
                             id="profilePicInput"
                           />
                           {profilePicPreview ? (
@@ -173,7 +226,7 @@ const Profile = () => {
                             onClick={() =>
                               document.getElementById("profilePicInput").click()
                             }
-                            className="absolute bottom-0 right-0 "
+                            className="absolute bottom-0 right-0 cursor-pointer"
                           />
                         </div>
                       </div>

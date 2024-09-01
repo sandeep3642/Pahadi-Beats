@@ -187,6 +187,12 @@ const Login = () => {
               Register
             </Link>
           </p>
+          <p className="text-gray-400 mt-4">
+            Forgot your password?
+            <Link to="/forgot-password" className="text-purple-500 underline ml-2">
+              Click here
+            </Link>
+          </p>
         </div>
       </div>
       {isLoading && <Spinner />} {/* Show spinner when loading */}
