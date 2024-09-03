@@ -21,7 +21,6 @@ const Footer = () => {
           </ul>
         </div>
 
-
         {/* Useful Links */}
         <div>
           <p className="text-lg font-bold mb-4">Download Links</p>
@@ -47,53 +46,17 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/*  Plans */}
+        {/* Plans */}
         <div>
           <p className="text-lg font-bold mb-4">Pahadi Beat Plans</p>
           <ul className="space-y-2">
             <li>
               <a
-                href="https://example.com/premium-individual" // Replace with actual URL
+                href="buy-plans" // Replace with actual URL
                 className="text-gray-400 hover:text-white"
                 aria-label="Premium Individual"
               >
                 Premium Individual
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://example.com/premium-duo" // Replace with actual URL
-                className="text-gray-400 hover:text-white"
-                aria-label="Premium Duo"
-              >
-                Premium Duo
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://example.com/premium-family" // Replace with actual URL
-                className="text-gray-400 hover:text-white"
-                aria-label="Premium Family"
-              >
-                Premium Family
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://example.com/premium-student" // Replace with actual URL
-                className="text-gray-400 hover:text-white"
-                aria-label="Premium Student"
-              >
-                Premium Student
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://example.com/pahadi-free" // Replace with actual URL
-                className="text-gray-400 hover:text-white"
-                aria-label="Pahadi beats Free"
-              >
-                Pahadi Beats Free
               </a>
             </li>
           </ul>
@@ -101,25 +64,29 @@ const Footer = () => {
       </div>
 
       {/* Social Media Links */}
-      <div className="mt-8 flex justify-center space-x-4">
-        <a
-          href="https://instagram.com" // Replace with actual Instagram URL
-          className="text-gray-400 hover:text-white"
-          aria-label="Instagram"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <FaInstagram className="w-6 h-6" />
-        </a>
-        <a
-          href="https://twitter.com" // Replace with actual Twitter URL
-          className="text-gray-400 hover:text-white"
-          aria-label="Twitter"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <FaTwitter className="w-6 h-6" />
-        </a>
+      <div className="mt-8 flex flex-col items-center space-y-4">
+        <div className="flex space-x-4">
+          <a
+            href="https://instagram.com" // Replace with actual Instagram URL
+            className="text-gray-400 hover:text-white"
+            aria-label="Instagram"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaInstagram className="w-6 h-6" />
+          </a>
+          <a
+            href="https://twitter.com" // Replace with actual Twitter URL
+            className="text-gray-400 hover:text-white"
+            aria-label="Twitter"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaTwitter className="w-6 h-6" />
+          </a>
+        </div>
+        {/* Corrected Footer Text */}
+        <p className="text-gray-400">© 2024 Pahadi Beats. All rights reserved.</p>
       </div>
     </nav>
   );

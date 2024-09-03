@@ -15,6 +15,8 @@ import GoogleAuthCallback from "./components/GoogleAuthCallback";
 import Settings from "./components/Setting";
 import ForgetPassword from "./components/ForgetPassword";
 import ResetPasswordPage from "./components/ResetPasswordPage";
+import BuyPlans from "./components/BuyPlans";
+import TermsCondition from "./components/TermsCondition";
 
 function App() {
   return (
@@ -47,6 +49,8 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/aboutArtist/:id" element={<AboutArtist />} />{" "}
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/buy-plans" element={<BuyPlans />} />
+          <Route path="/terms" element={<TermsCondition />} />
           <Route
             path="/auth/google/callback"
             element={<GoogleAuthCallback />}
