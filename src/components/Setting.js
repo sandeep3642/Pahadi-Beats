@@ -14,11 +14,29 @@ const Settings = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const dispatch = useDispatch();
   const { profile } = useSelector((state) => state.profile);
+  const [subscriptions, setMySubscriptions] = useState([]);
 
   useEffect(() => {
     dispatch(fetchProfile());
   }, [dispatch]);
-
+  useEffect(() => {
+    const fetchSubscriptions = async () => {
+      try {
+        const response = await apiHelper(
+          "/api/subscription/getUserSubscription",
+          "GET"
+        );
+        if (response.status === 200) {
+          setMySubscriptions(response.data);
+        } else {
+          toast.error(response.data.error || "Failed to fetch subscriptions.");
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.error || "An error occurred.");
+      }
+    };
+    fetchSubscriptions();
+  }, []);
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -26,7 +44,9 @@ const Settings = () => {
   const getReferralLink = () => {
     const baseUrl = window.location.origin;
     const referralCode = profile?.myReferralCode || "";
-    return `${baseUrl}/register/?referralCode=${encodeURIComponent(referralCode)}`;
+    return `${baseUrl}/register/?referralCode=${encodeURIComponent(
+      referralCode
+    )}`;
   };
 
   const handleShareFacebook = () => {
@@ -72,7 +92,7 @@ const Settings = () => {
         "POST",
         { oldPassword, newPassword } // Ensure this object is correct
       );
-  
+
       if (response.status === 200) {
         toast.success("Password updated successfully!");
       } else {
@@ -84,7 +104,7 @@ const Settings = () => {
   };
   const handleSubmitPasswordChange = (values, { resetForm }) => {
     const { oldPassword, newPassword } = values;
-    console.log(values)
+    console.log(values);
     handlePasswordChange(oldPassword, newPassword);
     resetForm();
   };
@@ -234,6 +254,85 @@ const Settings = () => {
                   </Form>
                 )}
               </Formik>
+            </div>
+
+            {/* My Subscription Section */}
+            <div className="bg-white text-black p-4 rounded shadow-md md:col-span-2">
+              <h2 className="text-xl font-bold mb-4">My Subscription</h2>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead>
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Subscription Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Description
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Price
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Start Date
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        End Date
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {subscriptions.length > 0 ? (
+                      subscriptions.map((subscription) => (
+                        <tr key={subscription._id}>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {subscription.name}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {subscription.description}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            ₹{subscription.price.toFixed(2)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {new Date(
+                              subscription.startDate
+                            ).toLocaleDateString()}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {new Date(
+                              subscription.endDate
+                            ).toLocaleDateString()}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span
+                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                subscription.status === "active"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                              }`}
+                            >
+                              {subscription.status.charAt(0).toUpperCase() +
+                                subscription.status.slice(1)}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="6"
+                          className="px-6 py-4 whitespace-nowrap text-center text-gray-500"
+                        >
+                          No subscriptions found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
