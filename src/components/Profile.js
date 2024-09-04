@@ -89,20 +89,21 @@ const Profile = () => {
       reader.readAsDataURL(file);
     });
   };
-
   const handleSubmit = async (values, { setSubmitting }) => {
-    // setIsLoading(true);
-
     const changedValues = {};
     Object.keys(values).forEach((key) => {
-      if (values[key] !== profile[key]) {
+      if (key === "profilePic") {
+        // Compare the profilePic preview with the original profilePic URL
+        if (profilePicPreview !== profile.profilePic) {
+          changedValues[key] = values[key];
+        }
+      } else if (values[key] !== profile[key]) {
         changedValues[key] = values[key];
       }
     });
 
     if (Object.keys(changedValues).length === 0) {
       toast.info("No changes to update.");
-      // setIsLoading(false);
       setSubmitting(false);
       return;
     }
@@ -118,14 +119,7 @@ const Profile = () => {
     }
 
     try {
-      const token = localStorage.getItem("token");
-      const sessionId = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("sessionId="))
-        .split("=")[1];
       const headers = {
-        Authorization: `Bearer ${token}`,
-        sessionId: sessionId,
         "Content-Type": "multipart/form-data",
       };
 
@@ -138,13 +132,14 @@ const Profile = () => {
 
       if (response.status === 200) {
         toast.success("Profile updated successfully!");
+        // Update the profilePicPreview state with the new profile picture URL
+        setProfilePicPreview(profile.profilePic);
       } else {
         toast.error(`Error updating profile: ${response.message}`);
       }
     } catch (error) {
       toast.error(`Error updating profile: ${error.message}`);
     } finally {
-      // setIsLoading(false);
       setSubmitting(false);
     }
   };
