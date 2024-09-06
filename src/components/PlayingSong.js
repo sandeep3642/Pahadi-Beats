@@ -93,7 +93,7 @@ const PlayingSong = ({ song, playlist, currentSongIndex, isPlaying, onChangeSong
       <div className="playing-song flex flex-col md:flex-row items-center justify-between p-2 w-full max-w-full mx-auto">
         <div className="flex items-center mb-2 md:mb-0">
           <img
-            src={song.album.coverImage || "default-cover-image.jpg"}
+            src={song.album?.coverImage || "default-cover-image.jpg"}
             alt="Now playing cover art"
             className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg mr-2 md:mr-4"
           />
@@ -102,7 +102,6 @@ const PlayingSong = ({ song, playlist, currentSongIndex, isPlaying, onChangeSong
               {song.title}
             </h3>
             <p className="text-xs md:text-sm text-gray-400 truncate">
-              {song.artists.map((artist) => artist.name).join(", ")}
             </p>
           </div>
         </div>

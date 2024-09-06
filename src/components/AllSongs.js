@@ -5,7 +5,11 @@ import Sidebar from "./Sidebar";
 import Spinner from "./Spinner";
 import apiHelper from "../utils/apiHelper";
 import PlayingSong from "./PlayingSong";
-
+import { MdFileDownload, MdLock } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+import localforage from "localforage";
+import { toast, ToastContainer } from "react-toastify"; // Import toast and ToastContainer from react-toastify
+import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
 const AllSongs = () => {
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,6 +20,8 @@ const AllSongs = () => {
   const [currentSongIndex, setCurrentSongIndex] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
   const pageSize = 10;
+  const [isSubscribed, setIsSubscribed] = useState(false); // Add subscription state
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSongs = async () => {
@@ -90,6 +96,61 @@ const AllSongs = () => {
     setIsPlaying(!isPlaying);
   };
 
+  useEffect(() => {
+    const fetchSubscriptions = async () => {
+      try {
+        const response = await apiHelper(
+          "/api/subscription/getUserSubscription",
+          "GET"
+        );
+        if (response.status === 200) {
+          console.log(response.data, ">>>>>>>>>>>>>>>>>>>>>>");
+          if (response.data[0].status === "active") {
+            setIsSubscribed(true);
+          }
+        }
+      } catch (error) {
+        console.error(error.response?.data?.error || "An error occurred.");
+      }
+    };
+    fetchSubscriptions();
+  }, []);
+  const handleDownload = async (songId, songTitle) => {
+    try {
+      setLoading(true);
+      const response = await apiHelper(
+        `/api/song/download/${songId}`,
+        "GET",
+        null,
+        null,
+        null,
+        true
+      );
+      if (response.data) {
+        console.log(typeof(response.data),">>>>>>>>>>>>>>>>>")
+        const blob = new Blob([response.data], { type: "audio/mpeg" });
+        await localforage.setItem(`song_${songId}`, {
+          blob,
+          title: songTitle,
+          id: songId,
+        });
+  
+        console.log("Song downloaded and saved successfully");
+        toast.success("Song downloaded and saved successfully")
+      }
+    } catch (error) {
+      console.log(error);
+    }finally {
+      setLoading(false);
+    }
+ 
+   
+  };
+
+  const handleLockClick = () => {
+    navigate("/buy-plans");
+  };
+
   return (
     <div className="flex flex-col h-screen">
       <div className="flex flex-1 overflow-hidden">
@@ -110,6 +171,9 @@ const AllSongs = () => {
                       </th>
                       <th className="py-2 px-2 md:px-4 text-center hidden md:table-cell">
                         Duration
+                      </th>
+                      <th className="py-2 px-2 md:px-4 text-center hidden md:table-cell">
+                        Action
                       </th>
                     </tr>
                   </thead>
@@ -155,6 +219,29 @@ const AllSongs = () => {
                         <td className="py-2 px-2 md:px-4 text-gray-400 hidden md:table-cell">
                           {song.duration}
                         </td>
+                        <td className="ml-2 md:ml-4 text-purple-400 hover:text-purple-600">
+                          {isSubscribed ? (
+                            <div className="relative inline-block">
+                              <MdFileDownload
+                                className="w-4 h-4 md:w-5 md:h-5"
+                                onClick={() =>
+                                  handleDownload(song._id, song.title)
+                                } // Correctly pass a function reference
+                              />
+                            </div>
+                          ) : (
+                            <div className="relative inline-block">
+                              <MdFileDownload
+                                className="w-4 h-4 md:w-5 md:h-5"
+                                onClick={handleLockClick}
+                              />
+                              <MdLock
+                                className="w-3 h-3 md:w-4 md:h-4 absolute top-2 left-2 text-red-600"
+                                onClick={handleLockClick}
+                              />
+                            </div>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -191,9 +278,11 @@ const AllSongs = () => {
               onChangeSong={handleChangeSong}
               onPlayPause={handlePlayPause}
             />
-          )}  
+          )}
         </main>
       </div>
+      {loading && <Spinner />} {/* Show spinner when loading */}
+      <ToastContainer /> {/* Add ToastContainer to render toasts */}
     </div>
   );
 };
