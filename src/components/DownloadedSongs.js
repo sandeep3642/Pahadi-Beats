@@ -11,7 +11,7 @@ const DownloadedSongs = () => {
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
-  const [currTime, setCurrTime] = useState({ min: 0, sec: 0 });
+  const [currTime, setCurrTime] = useState(0); // Changed to seconds for easier handling
   const [error, setError] = useState(null);
   const [currentSongUrl, setCurrentSongUrl] = useState(null);
   const playerRef = useRef(null);
@@ -37,8 +37,6 @@ const DownloadedSongs = () => {
 
         if (songs.length === 0) {
           setError("No valid downloaded songs found.");
-        } else {
-          console.log(`Found ${songs.length} downloaded songs`);
         }
 
         setDownloadedSongs(songs);
@@ -53,7 +51,6 @@ const DownloadedSongs = () => {
     fetchDownloadedSongs();
   }, []);
 
-  // Manage the current song's URL and clean up URL on song change
   useEffect(() => {
     if (downloadedSongs.length > 0 && downloadedSongs[currentSongIndex]?.blob) {
       const songBlobUrl = URL.createObjectURL(downloadedSongs[currentSongIndex].blob);
@@ -108,6 +105,13 @@ const DownloadedSongs = () => {
     setError(null);
   };
 
+  const handleProgressChange = (e) => {
+    const newProgress = parseFloat(e.target.value);
+    if (playerRef.current) {
+      playerRef.current.seekTo(newProgress);
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen">
       <div className="flex flex-1 overflow-hidden">
@@ -156,8 +160,8 @@ const DownloadedSongs = () => {
             </section>
           )}
           {currentSong && currentSongUrl && (
-            <div className="bg-gray-800 shadow-lg">
-              <div className="playing-song flex flex-col md:flex-row items-center justify-between p-2 w-full max-w-full mx-auto">
+            <div className="bg-gray-800 shadow-lg p-4">
+              <div className="playing-song flex flex-col md:flex-row items-center justify-between">
                 <div className="flex items-center mb-2 md:mb-0">
                   <img
                     src={currentSong.album?.coverImage || "/api/placeholder/80/80"}
@@ -205,14 +209,23 @@ const DownloadedSongs = () => {
                     onError={handlePlayerError}
                     onDuration={(duration) => setDuration(duration)}
                     onProgress={({ playedSeconds }) => {
-                      const min = Math.floor(playedSeconds / 60);
-                      const sec = Math.floor(playedSeconds % 60);
-                      setCurrTime({ min, sec });
+                      setCurrTime(playedSeconds);
                     }}
                     onEnded={handleNext}
                   />
-                  <div className="time-display text-xs text-gray-400">
-                    {formatTime(currTime.min)}:{formatTime(currTime.sec)} / {formatTime(Math.floor(duration / 60))}:{formatTime(Math.floor(duration % 60))}
+                  <div className="w-full mt-2">
+                    <input
+                      type="range"
+                      min="0"
+                      max={duration}
+                      value={currTime}
+                      onChange={handleProgressChange}
+                      className="w-full accent-purple-500"
+                    />
+                    <div className="flex justify-between text-xs text-gray-400">
+                      <span>{formatTime(Math.floor(currTime / 60))}:{formatTime(Math.floor(currTime % 60))}</span>
+                      <span>{formatTime(Math.floor(duration / 60))}:{formatTime(Math.floor(duration % 60))}</span>
+                    </div>
                   </div>
                 </div>
               </div>

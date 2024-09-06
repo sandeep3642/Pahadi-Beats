@@ -10,7 +10,7 @@ module.exports = {
       skipWaiting: true,
       runtimeCaching: [
         {
-          urlPattern: new RegExp('/downloadedsongs'),
+          urlPattern: new RegExp('/downloaded-songs'),
           handler: 'NetworkFirst', // Tries to fetch from the network, falls back to cache
           options: {
             cacheName: 'downloaded-songs-cache',
