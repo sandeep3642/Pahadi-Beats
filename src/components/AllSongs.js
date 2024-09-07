@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaPlay, FaPause } from "react-icons/fa";
+import { FaPlay, FaPause, FaBars } from "react-icons/fa";
 import { IoMdArrowRoundBack, IoMdArrowRoundForward } from "react-icons/io";
 import Sidebar from "./Sidebar";
 import Spinner from "./Spinner";
@@ -11,6 +11,11 @@ import localforage from "localforage";
 import { toast, ToastContainer } from "react-toastify"; // Import toast and ToastContainer from react-toastify
 import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
 const AllSongs = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -127,24 +132,22 @@ const AllSongs = () => {
         true
       );
       if (response.data) {
-        console.log(typeof(response.data),">>>>>>>>>>>>>>>>>")
+        console.log(typeof response.data, ">>>>>>>>>>>>>>>>>");
         const blob = new Blob([response.data], { type: "audio/mpeg" });
         await localforage.setItem(`song_${songId}`, {
           blob,
           title: songTitle,
           id: songId,
         });
-  
+
         console.log("Song downloaded and saved successfully");
-        toast.success("Song downloaded and saved successfully")
+        toast.success("Song downloaded and saved successfully");
       }
     } catch (error) {
       console.log(error);
-    }finally {
+    } finally {
       setLoading(false);
     }
- 
-   
   };
 
   const handleLockClick = () => {
@@ -153,9 +156,22 @@ const AllSongs = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
-        <main className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex flex-col md:flex-row min-h-screen bg-purple-1000">
+        {/* Sidebar */}
+        <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+
+        {/* Main content area */}
+        <main className="flex-1 flex flex-col">
+          <header className="bg-black text-white p-4 flex justify-between items-center md:hidden">
+            <h1 className="text-xl font-bold">Pahadi Beats</h1>
+            <button
+              className="text-white focus:outline-none"
+              onClick={toggleSidebar}
+              aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+            >
+              <FaBars size={24} />
+            </button>
+          </header>
           {loading ? (
             <Spinner />
           ) : (
