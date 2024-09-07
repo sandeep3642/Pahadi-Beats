@@ -12,7 +12,7 @@ import { showConfirmDialog } from "../utils/confirmDialog";
 import apiHelper from "../utils/apiHelper";
 import { MdFileDownload, MdLock } from "react-icons/md";
 
-const logoPath = process.env.PUBLIC_URL + "/logo1.png";
+const logoPath = process.env.PUBLIC_URL + "/PB.png";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [isSubscribed, setIsSubscribed] = useState(false); // Add subscription state
@@ -25,7 +25,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           "GET"
         );
         if (response.status === 200) {
-          console.log(response.data, ">>>>>>>>>>>>>>>>>>>>>>");
           if (response.data[0].status === "active") {
             setIsSubscribed(true);
           }

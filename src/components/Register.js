@@ -12,7 +12,7 @@ import { isValidPhoneNumber } from "libphonenumber-js";
 import { useSearchParams } from "react-router-dom"; // Import useSearchParams from react-router-dom
 import { FcGoogle } from "react-icons/fc";
 
-const logoPath = process.env.PUBLIC_URL + "/logo1.png";
+const logoPath = process.env.PUBLIC_URL + "/PB.png";
 
 // Validation schema using Yup
 const validationSchema = Yup.object({

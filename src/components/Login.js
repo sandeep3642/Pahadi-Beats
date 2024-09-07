@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
 import apiHelper from "../utils/apiHelper";
 import { FcGoogle } from "react-icons/fc";
 
-const logoPath = process.env.PUBLIC_URL + "/logo1.png";
+const logoPath = process.env.PUBLIC_URL + "/PB.png";
 
 const Login = () => {
   const [loginMethod, setLoginMethod] = useState("email"); // "email" or "phone"
@@ -99,7 +99,7 @@ const Login = () => {
         <img
           src={logoPath}
           alt="Warble Logo"
-          className="w-32 h-32 mx-auto mb-6 rounded-full"
+          className="w-32 h-32 mx-auto mb-6"
         />
         <h1 className="text-2xl font-bold mb-4 text-white text-center">Login</h1>
         <p className="text-white mb-6 text-center">Sign In to your account</p>
