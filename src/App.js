@@ -19,6 +19,7 @@ import BuyPlans from "./components/BuyPlans";
 import TermsCondition from "./components/TermsCondition";
 import DownloadedSongs from "./components/DownloadedSongs";
 import AboutAlbum from "./components/AboutAlbum";
+import AboutSong from "./components/AboutSong";
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
           <Route path="/terms" element={<TermsCondition />} />
           <Route path="/downloaded-songs" element={<DownloadedSongs />} />
           <Route path="/about-album/:id" element={<AboutAlbum />} />{" "}
+          <Route path="/aboutSong" element={<AboutSong />} />{" "}
           <Route
             path="/auth/google/callback"
             element={<GoogleAuthCallback />}

@@ -4,6 +4,7 @@ import { FaPlay, FaPause, FaStepBackward, FaStepForward } from "react-icons/fa";
 import Sidebar from "./Sidebar";
 import Spinner from "./Spinner";
 import localforage from "localforage";
+const track = process.env.PUBLIC_URL + "/track.gif";
 
 const DownloadedSongs = () => {
   const [downloadedSongs, setDownloadedSongs] = useState([]);
@@ -132,6 +133,7 @@ const DownloadedSongs = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="text-white">
                     <tr>
+                    <th className="py-2 px-4 text-left">#</th>
                       <th className="py-2 px-4 text-left">Title</th>
                       <th className="py-2 px-4 text-left">Action</th>
                     </tr>
@@ -139,8 +141,9 @@ const DownloadedSongs = () => {
                   <tbody className="divide-y divide-gray-700">
                     {downloadedSongs.map((song, index) => (
                       <tr key={song.id} className={`hover:bg-gray-800 ${index === currentSongIndex ? 'bg-gray-700' : ''}`}>
-                        <td className="py-2 px-4 text-white">{song.title}</td>
-                        <td className="py-2 px-4 text-white">
+                         <td className="py-2 px-4 text-white text-left">{index+1}</td>
+                        <td className="py-2 px-4 text-white text-left">{song.title}</td>
+                        <td className="py-2 px-4 text-white text-left">
                           <button
                             onClick={() => handleSongSelect(index)}
                             className="ml-2 text-purple-400 hover:text-purple-600"
@@ -164,7 +167,7 @@ const DownloadedSongs = () => {
               <div className="playing-song flex flex-col md:flex-row items-center justify-between">
                 <div className="flex items-center mb-2 md:mb-0">
                   <img
-                    src={currentSong.album?.coverImage || "/api/placeholder/80/80"}
+                    src={currentSong.album?.coverImage || track}
                     alt="Now playing cover art"
                     className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg mr-2 md:mr-4"
                   />

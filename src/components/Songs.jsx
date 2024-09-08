@@ -48,8 +48,10 @@ const Songs = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handlePlaySong = (song) => {
-    navigate("/allsongs");
+  const handlePlaySong = (songId) => {
+    navigate("/aboutSong",{
+      state: { songId }
+    });
   };
 
   const handleNextPage = () => {
@@ -82,11 +84,11 @@ const Songs = () => {
             </div>
 
             {/* Background card on hover */}
-            <div className="absolute inset-0 bg-gray-500 flex flex-col items-center justify-center p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <div className="absolute inset-0 bg-gray-500 bg-opacity-80 flex flex-col items-center justify-center p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
               <button
                 aria-label={`Play ${song.title}`}
                 className="bg-purple-1000 rounded-full p-2 cursor-pointer hover:bg-purple-700"
-                onClick={() => handlePlaySong(song)}
+                onClick={() => handlePlaySong(song._id)}
               >
                 <FaPlay className="fill-white w-6 h-6" />
               </button>

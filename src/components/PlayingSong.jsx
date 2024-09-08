@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { FaPlay, FaPause, FaStepBackward, FaStepForward } from "react-icons/fa";
 
 const PlayingSong = ({ song, playlist, currentSongIndex, isPlaying, onChangeSong, onPlayPause }) => {
-  console.log(song,">>>>>>>>>>>>>>>>>>song")
   const [currTime, setCurrTime] = useState({ min: 0, sec: 0 });
   const [duration, setDuration] = useState(0);
   const audioRef = useRef(null);
