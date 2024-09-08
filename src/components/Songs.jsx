@@ -15,7 +15,7 @@ const Songs = () => {
   function getResponsivePageSize() {
     if (window.innerWidth >= 1280) return 6; // Large screens show 6 items
     if (window.innerWidth >= 1024) return 4; // Medium screens show 4 items
-    if (window.innerWidth >= 768) return 2; // Small screens show 2 items
+    if (window.innerWidth >= 768) return 4; // Small screens show 2 items
     return 2; // Extra small screens show 2 items
   }
 

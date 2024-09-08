@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaPlay } from "react-icons/fa";
 import apiHelper from "../utils/apiHelper";
+import { Link } from "react-router-dom";
 
 const Album = () => {
   const [albums, setAlbums] = useState([]);
@@ -35,15 +36,15 @@ const Album = () => {
           </div>
 
           {/* Background card on hover */}
-          <div className="absolute inset-0 bg-gray-500 flex flex-col items-center justify-center p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-            <button
-              aria-label={`Play ${album.title}`}
-              className="bg-purple-1000 rounded-full p-2 cursor-pointer hover:bg-purple-700"
-            >
-              <FaPlay className="fill-white w-6 h-6" />
-            </button>
-            <span className="text-white mt-2 text-center">{album.title}</span>
-          </div>
+          <Link to={`/about-album/${album._id}`}>
+            <div className="absolute inset-0 bg-gray-500 flex flex-col items-center justify-center p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <button
+                aria-label={`Play ${album.title}`}
+                className="bg-purple-1000 rounded-full p-2 cursor-pointer hover:bg-purple-700"
+              ></button>
+              <span className="text-white mt-2 text-center">{album.title}</span>
+            </div>
+          </Link>
         </div>
       ))}
     </div>

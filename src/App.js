@@ -18,6 +18,7 @@ import ResetPasswordPage from "./components/ResetPasswordPage";
 import BuyPlans from "./components/BuyPlans";
 import TermsCondition from "./components/TermsCondition";
 import DownloadedSongs from "./components/DownloadedSongs";
+import AboutAlbum from "./components/AboutAlbum";
 
 function App() {
   return (
@@ -48,11 +49,12 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/forgot-password" element={<ForgetPassword />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/aboutArtist/:id" element={<AboutArtist />} />{" "}
+          <Route path="/aboutArtist/:id" element={<AboutArtist />} /> {" "}
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/buy-plans" element={<BuyPlans />} />
           <Route path="/terms" element={<TermsCondition />} />
           <Route path="/downloaded-songs" element={<DownloadedSongs />} />
+          <Route path="/about-album/:id" element={<AboutAlbum />} />{" "}
           <Route
             path="/auth/google/callback"
             element={<GoogleAuthCallback />}

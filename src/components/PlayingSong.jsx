@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { FaPlay, FaPause, FaStepBackward, FaStepForward } from "react-icons/fa";
 
 const PlayingSong = ({ song, playlist, currentSongIndex, isPlaying, onChangeSong, onPlayPause }) => {
+  console.log(song,">>>>>>>>>>>>>>>>>>song")
   const [currTime, setCurrTime] = useState({ min: 0, sec: 0 });
   const [duration, setDuration] = useState(0);
   const audioRef = useRef(null);
@@ -93,7 +94,7 @@ const PlayingSong = ({ song, playlist, currentSongIndex, isPlaying, onChangeSong
       <div className="playing-song flex flex-col md:flex-row items-center justify-between p-2 w-full max-w-full mx-auto">
         <div className="flex items-center mb-2 md:mb-0">
           <img
-            src={song.album?.coverImage || "default-cover-image.jpg"}
+            src={song.album?.coverImage || song?.coverImage}
             alt="Now playing cover art"
             className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg mr-2 md:mr-4"
           />
