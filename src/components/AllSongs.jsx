@@ -6,7 +6,7 @@ import Spinner from "./Spinner";
 import apiHelper from "../utils/apiHelper";
 import PlayingSong from "./PlayingSong";
 import { MdFileDownload, MdLock } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import localforage from "localforage";
 import { toast, ToastContainer } from "react-toastify"; // Import toast and ToastContainer from react-toastify
 import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
@@ -16,6 +16,8 @@ const AllSongs = () => {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+  const location = useLocation();
+  const  artist  = location.state || ""; // Get artist from location state
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,7 +35,7 @@ const AllSongs = () => {
       setLoading(true);
       try {
         const data = await apiHelper(
-          `/api/song/getAllSongs?pageNumber=${currentPage}&pageSize=${pageSize}`,
+          `/api/song/getAllSongs?pageNumber=${currentPage}&pageSize=${pageSize}&artist=${artist}`,
           "GET"
         );
         if (data && data.data && data.pagination) {
@@ -53,7 +55,7 @@ const AllSongs = () => {
     const fetchPlaylist = async () => {
       try {
         const data = await apiHelper(
-          `/api/song/getAllSongs?pageNumber=${currentPage}&pageSize=${pageSize}`,
+          `/api/song/getAllSongs?pageNumber=${currentPage}&pageSize=${pageSize}&artist=${artist}`,
           "GET"
         );
         setPlaylist(data.data);
@@ -65,7 +67,7 @@ const AllSongs = () => {
 
     fetchSongs();
     fetchPlaylist();
-  }, [currentPage]);
+  }, [currentPage,artist]);
 
   const handlePlaySong = (song) => {
     if (song && currentSong && currentSong._id === song._id) {
@@ -109,7 +111,6 @@ const AllSongs = () => {
           "GET"
         );
         if (response.status === 200) {
-          console.log(response.data, ">>>>>>>>>>>>>>>>>>>>>>");
           if (response.data[0].status === "active") {
             setIsSubscribed(true);
           }
