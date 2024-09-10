@@ -56,7 +56,7 @@ const Footer = () => {
                 className="text-gray-400 hover:text-white"
                 aria-label="Premium Individual"
               >
-                Premium Individual
+                Buy subscription
               </a>
             </li>
           </ul>

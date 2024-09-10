@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { FaPlay } from "react-icons/fa";
 import apiHelper from "../utils/apiHelper";
 import { Link } from "react-router-dom";
 
@@ -21,7 +20,7 @@ const Album = () => {
 
   return (
     <div className="flex overflow-x-auto gap-4 p-4">
-      {albums.map((album) => (
+      {albums.slice(0,6).map((album) => (
         <div
           key={album._id}
           className="relative flex flex-col items-center group p-2 transition-transform transform hover:scale-105"

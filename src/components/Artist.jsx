@@ -20,7 +20,7 @@ const Artist = () => {
 
   return (
     <div className="flex overflow-x-auto gap-4 p-4">
-      {artists.map((artist) => (
+      {artists.slice(0, 6).map((artist) => (
         <div
           key={artist._id}
           className="relative flex flex-col items-center group rounded-full p-2 transition-transform transform hover:scale-105"

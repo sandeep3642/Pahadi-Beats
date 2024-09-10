@@ -20,6 +20,8 @@ import TermsCondition from "./components/TermsCondition";
 import DownloadedSongs from "./components/DownloadedSongs";
 import AboutAlbum from "./components/AboutAlbum";
 import AboutSong from "./components/AboutSong";
+import AllArtist from "./components/AllArtists";
+import AllAlbum from "./components/AllAlbum";
 
 function App() {
   return (
@@ -57,6 +59,8 @@ function App() {
           <Route path="/downloaded-songs" element={<DownloadedSongs />} />
           <Route path="/about-album/:id" element={<AboutAlbum />} />{" "}
           <Route path="/aboutSong" element={<AboutSong />} />{" "}
+          <Route path="/allartists" element={<AllArtist />} />{" "}
+          <Route path="/allalbums" element={<AllAlbum />} />{" "}
           <Route
             path="/auth/google/callback"
             element={<GoogleAuthCallback />}

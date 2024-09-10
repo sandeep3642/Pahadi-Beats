@@ -5,13 +5,14 @@ import apiHelper from "../utils/apiHelper";
 import { load } from "@cashfreepayments/cashfree-js";
 import Spinner from "./Spinner";
 import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
 const BuyPlans = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [subscriptions, setSubscriptions] = useState([]);
   const [cashfree, setCashfree] = useState(null);
-  const [loading, setLoading] = useState(false);  // State for loading indicator
+  const [loading, setLoading] = useState(false); // State for loading indicator
+  const [isSubscribed, setIsSubscribed] = useState(false); // Add subscription state
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -32,7 +33,7 @@ const BuyPlans = () => {
   }, []);
 
   const fetchSubscriptions = async () => {
-    setLoading(true);  // Start loading
+    setLoading(true); // Start loading
     try {
       const response = await apiHelper(
         "/api/subscription/getAllSubscription",
@@ -43,36 +44,59 @@ const BuyPlans = () => {
       console.error("Error fetching subscriptions:", error);
       toast.error("Failed to load subscriptions. Please try again later.");
     } finally {
-      setLoading(false);  // Stop loading
+      setLoading(false); // Stop loading
     }
   };
 
   useEffect(() => {
     fetchSubscriptions();
+    fetchUserSubscriptions();
   }, []);
-
-  const getSessionId = async (subscriptionId) => {
-    setLoading(true);  // Start loading
+  const fetchUserSubscriptions = async () => {
     try {
-      const response = await apiHelper("/api/payment/payment", "GET", null, null, { subscriptionId });
+      const response = await apiHelper(
+        "/api/subscription/getUserSubscription",
+        "GET"
+      );
+      if (response.data[0].status === "active") {
+        setIsSubscribed(true);
+      } else {
+        toast.error(response.data.error || "Failed to fetch subscriptions.");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error || "An error occurred.");
+    }
+  };
+  const getSessionId = async (subscriptionId) => {
+    setLoading(true); // Start loading
+    try {
+      const response = await apiHelper(
+        "/api/payment/payment",
+        "GET",
+        null,
+        null,
+        { subscriptionId }
+      );
       if (response) {
         return {
-          sessionId:response?.payment_session_id,
-          orderId:response.order_id
+          sessionId: response?.payment_session_id,
+          orderId: response.order_id,
         };
       }
     } catch (error) {
       console.error("Error getting session ID:", error);
       toast.error("Failed to initiate payment. Please try again.");
     } finally {
-      setLoading(false);  // Stop loading
+      setLoading(false); // Stop loading
     }
   };
 
   const verifyPayment = async (orderId) => {
-    setLoading(true);  // Start loading
+    setLoading(true); // Start loading
     try {
-      const res = await apiHelper("/api/payment/verify", "POST", { orderId:orderId });
+      const res = await apiHelper("/api/payment/verify", "POST", {
+        orderId: orderId,
+      });
 
       if (res) {
         toast.success("Payment completed successfully!");
@@ -81,7 +105,7 @@ const BuyPlans = () => {
       console.error("Error verifying payment:", error);
       toast.error("Failed to verify payment. Please try again.");
     } finally {
-      setLoading(false);  // Stop loading
+      setLoading(false); // Stop loading
     }
   };
 
@@ -90,15 +114,15 @@ const BuyPlans = () => {
       toast.error("Cashfree SDK not loaded. Please try again later.");
       return;
     }
-  
+
     try {
       const data = await getSessionId(subscriptionId);
-      if (data.sessionId) {  
+      if (data.sessionId) {
         const checkoutOptions = {
           paymentSessionId: data.sessionId,
           redirectTarget: "_modal",
         };
-  
+
         cashfree
           .checkout(checkoutOptions)
           .then(() => {
@@ -117,12 +141,10 @@ const BuyPlans = () => {
       toast.error("Failed to initiate payment. Please try again.");
     }
   };
-  
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-purple-1000">
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-
       <main className="flex-1 flex flex-col p-4">
         <header className="bg-black text-white p-4 flex justify-between items-center md:hidden">
           <h1 className="text-xl font-bold">Pahadi Beats</h1>
@@ -134,9 +156,7 @@ const BuyPlans = () => {
             <FaBars size={24} />
           </button>
         </header>
-
-        {loading && <Spinner />}  {/* Display spinner while loading */}
-
+        {loading && <Spinner />} {/* Display spinner while loading */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
           {subscriptions && subscriptions.length > 0 ? (
             subscriptions.map((item, index) => (
@@ -156,10 +176,15 @@ const BuyPlans = () => {
                   ₹{item.price.toFixed(2)}
                 </p>
                 <button
-                  className="mt-6 bg-white text-purple-600 py-2 px-4 rounded-full hover:bg-purple-700 hover:text-white transition duration-300"
+                  className={`mt-6 py-2 px-4 rounded-full transition duration-300 ${
+                    isSubscribed
+                      ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                      : "bg-white text-purple-600 hover:bg-purple-700 hover:text-white"
+                  }`}
                   onClick={() => handleBuySubscription(item._id)}
+                  disabled={isSubscribed}
                 >
-                  Buy
+                  {isSubscribed ? "Already Subscribed" : "Buy"}
                 </button>
                 <div className="absolute bottom-4 right-4 bg-red-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-lg font-bold">
                   {item.days}
@@ -171,7 +196,6 @@ const BuyPlans = () => {
           )}
         </div>
       </main>
-
       <ToastContainer /> {/* Toast container to display notifications */}
     </div>
   );

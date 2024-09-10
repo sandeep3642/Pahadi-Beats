@@ -127,7 +127,9 @@ const AboutAlbum = () => {
                       {album?.title.toUpperCase()}
                     </h2>
                     <p className="text-md text-gray-400 mt-2">
-                      {album.artist.name}
+                    by {album.artist
+                            ?.map((artist) => artist.name)
+                            .join(", ") || "Unknown Artist"}
                     </p>
                     <p className="text-md text-gray-400">{album.releaseDate}</p>
                   </div>
