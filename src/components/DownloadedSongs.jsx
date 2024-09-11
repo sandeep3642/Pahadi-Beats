@@ -1,9 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import ReactPlayer from 'react-player';
-import { FaPlay, FaPause, FaStepBackward, FaStepForward } from "react-icons/fa";
+import ReactPlayer from "react-player";
+import {
+  FaPlay,
+  FaPause,
+  FaStepBackward,
+  FaStepForward,
+  FaBars,
+} from "react-icons/fa";
 import Sidebar from "./Sidebar";
 import Spinner from "./Spinner";
 import localforage from "localforage";
+import Header from "./Header";
 const track = process.env.PUBLIC_URL + "/track.gif";
 
 const DownloadedSongs = () => {
@@ -16,7 +23,11 @@ const DownloadedSongs = () => {
   const [error, setError] = useState(null);
   const [currentSongUrl, setCurrentSongUrl] = useState(null);
   const playerRef = useRef(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
   useEffect(() => {
     const fetchDownloadedSongs = async () => {
       setLoading(true);
@@ -54,7 +65,9 @@ const DownloadedSongs = () => {
 
   useEffect(() => {
     if (downloadedSongs.length > 0 && downloadedSongs[currentSongIndex]?.blob) {
-      const songBlobUrl = URL.createObjectURL(downloadedSongs[currentSongIndex].blob);
+      const songBlobUrl = URL.createObjectURL(
+        downloadedSongs[currentSongIndex].blob
+      );
       setCurrentSongUrl(songBlobUrl);
       return () => {
         URL.revokeObjectURL(songBlobUrl);
@@ -72,14 +85,19 @@ const DownloadedSongs = () => {
 
   const handlePrevious = () => {
     if (downloadedSongs.length > 0) {
-      setCurrentSongIndex((prevIndex) => (prevIndex - 1 + downloadedSongs.length) % downloadedSongs.length);
+      setCurrentSongIndex(
+        (prevIndex) =>
+          (prevIndex - 1 + downloadedSongs.length) % downloadedSongs.length
+      );
       setIsPlaying(true);
     }
   };
 
   const handleNext = () => {
     if (downloadedSongs.length > 0) {
-      setCurrentSongIndex((prevIndex) => (prevIndex + 1) % downloadedSongs.length);
+      setCurrentSongIndex(
+        (prevIndex) => (prevIndex + 1) % downloadedSongs.length
+      );
       setIsPlaying(true);
     }
   };
@@ -97,7 +115,9 @@ const DownloadedSongs = () => {
 
   const handlePlayerError = (e) => {
     console.error("Error playing song:", e);
-    setError(`Failed to play song: ${currentSong?.title}. The file may be corrupted or missing.`);
+    setError(
+      `Failed to play song: ${currentSong?.title}. The file may be corrupted or missing.`
+    );
     handleNext(); // Try playing the next song
   };
 
@@ -115,9 +135,27 @@ const DownloadedSongs = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
-        <main className="flex-1 flex flex-col overflow-hidden">
+      {/* Sidebar */}
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+
+      {/* Main content area */}
+      <main className="flex-1 flex flex-col">
+        {/* Header with hamburger menu */}
+        <header className="bg-black text-white p-4 flex justify-between items-center md:hidden">
+          <h1 className="text-xl font-bold">Pahadi Beats</h1>
+          <button
+            className="text-white focus:outline-none"
+            onClick={toggleSidebar}
+            aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+          >
+            <FaBars size={24} />
+          </button>
+        </header>
+
+        {/* Content area */}
+        <div className="flex-1 p-4 sm:p-6 text-white">
+          {/* Content sections */}
+          <Header />
           {loading ? (
             <Spinner />
           ) : (
@@ -133,16 +171,25 @@ const DownloadedSongs = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="text-white">
                     <tr>
-                    <th className="py-2 px-4 text-left">#</th>
+                      <th className="py-2 px-4 text-left">#</th>
                       <th className="py-2 px-4 text-left">Title</th>
                       <th className="py-2 px-4 text-left">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-700">
                     {downloadedSongs.map((song, index) => (
-                      <tr key={song.id} className={`hover:bg-gray-800 ${index === currentSongIndex ? 'bg-gray-700' : ''}`}>
-                         <td className="py-2 px-4 text-white text-left">{index+1}</td>
-                        <td className="py-2 px-4 text-white text-left">{song.title}</td>
+                      <tr
+                        key={song.id}
+                        className={`hover:bg-gray-800 ${
+                          index === currentSongIndex ? "bg-gray-700" : ""
+                        }`}
+                      >
+                        <td className="py-2 px-4 text-white text-left">
+                          {index + 1}
+                        </td>
+                        <td className="py-2 px-4 text-white text-left">
+                          {song.title}
+                        </td>
                         <td className="py-2 px-4 text-white text-left">
                           <button
                             onClick={() => handleSongSelect(index)}
@@ -162,80 +209,92 @@ const DownloadedSongs = () => {
               )}
             </section>
           )}
-          {currentSong && currentSongUrl && (
-            <div className="bg-gray-800 shadow-lg p-4">
-              <div className="playing-song flex flex-col md:flex-row items-center justify-between">
-                <div className="flex items-center mb-2 md:mb-0">
-                  <img
-                    src={currentSong.album?.coverImage || track}
-                    alt="Now playing cover art"
-                    className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg mr-2 md:mr-4"
-                  />
-                  <div className="song-details">
-                    <h3 className="text-sm md:text-lg font-semibold text-white truncate">
-                      {currentSong.title}
-                    </h3>
-                    <p className="text-xs md:text-sm text-gray-400 truncate">
-                      {currentSong.album?.artist || "Unknown Artist"}
-                    </p>
-                  </div>
+        </div>
+        {currentSong && currentSongUrl && (
+          <div className="bg-gray-800 shadow-lg p-4">
+            <div className="playing-song flex flex-col md:flex-row items-center justify-between">
+              <div className="flex items-center mb-2 md:mb-0">
+                <img
+                  src={currentSong.album?.coverImage || track}
+                  alt="Now playing cover art"
+                  className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg mr-2 md:mr-4"
+                />
+                <div className="song-details">
+                  <h3 className="text-sm md:text-lg font-semibold text-white truncate">
+                    {currentSong.title}
+                  </h3>
+                  <p className="text-xs md:text-sm text-gray-400 truncate">
+                    {currentSong.album?.artist || "Unknown Artist"}
+                  </p>
                 </div>
+              </div>
 
-                <div className="player-controls flex items-center space-x-2 md:space-x-4">
-                  <button onClick={handlePrevious} className="control-button text-white">
-                    <FaStepBackward className="w-4 h-4 md:w-5 md:h-5" />
-                  </button>
-                  <button
-                    onClick={handlePlayPause}
-                    className="bg-purple-500 text-white rounded-full p-2 md:p-3 focus:outline-none hover:bg-purple-600"
-                  >
-                    {isPlaying ? (
-                      <FaPause className="w-4 h-4 md:w-6 md:h-6" />
-                    ) : (
-                      <FaPlay className="w-4 h-4 md:w-6 md:h-6" />
-                    )}
-                  </button>
-                  <button onClick={handleNext} className="control-button text-white">
-                    <FaStepForward className="w-4 h-4 md:w-5 md:h-5" />
-                  </button>
-                </div>
+              <div className="player-controls flex items-center space-x-2 md:space-x-4">
+                <button
+                  onClick={handlePrevious}
+                  className="control-button text-white"
+                >
+                  <FaStepBackward className="w-4 h-4 md:w-5 md:h-5" />
+                </button>
+                <button
+                  onClick={handlePlayPause}
+                  className="bg-purple-500 text-white rounded-full p-2 md:p-3 focus:outline-none hover:bg-purple-600"
+                >
+                  {isPlaying ? (
+                    <FaPause className="w-4 h-4 md:w-6 md:h-6" />
+                  ) : (
+                    <FaPlay className="w-4 h-4 md:w-6 md:h-6" />
+                  )}
+                </button>
+                <button
+                  onClick={handleNext}
+                  className="control-button text-white"
+                >
+                  <FaStepForward className="w-4 h-4 md:w-5 md:h-5" />
+                </button>
+              </div>
 
-                <div className="flex flex-col items-center mt-2 md:mt-4">
-                  <ReactPlayer
-                    ref={playerRef}
-                    url={currentSongUrl}
-                    playing={isPlaying}
-                    controls={false}
-                    width="0"
-                    height="0"
-                    onReady={handlePlayerReady}
-                    onError={handlePlayerError}
-                    onDuration={(duration) => setDuration(duration)}
-                    onProgress={({ playedSeconds }) => {
-                      setCurrTime(playedSeconds);
-                    }}
-                    onEnded={handleNext}
+              <div className="flex flex-col items-center mt-2 md:mt-4">
+                <ReactPlayer
+                  ref={playerRef}
+                  url={currentSongUrl}
+                  playing={isPlaying}
+                  controls={false}
+                  width="0"
+                  height="0"
+                  onReady={handlePlayerReady}
+                  onError={handlePlayerError}
+                  onDuration={(duration) => setDuration(duration)}
+                  onProgress={({ playedSeconds }) => {
+                    setCurrTime(playedSeconds);
+                  }}
+                  onEnded={handleNext}
+                />
+                <div className="w-full mt-2">
+                  <input
+                    type="range"
+                    min="0"
+                    max={duration}
+                    value={currTime}
+                    onChange={handleProgressChange}
+                    className="w-full accent-purple-500"
                   />
-                  <div className="w-full mt-2">
-                    <input
-                      type="range"
-                      min="0"
-                      max={duration}
-                      value={currTime}
-                      onChange={handleProgressChange}
-                      className="w-full accent-purple-500"
-                    />
-                    <div className="flex justify-between text-xs text-gray-400">
-                      <span>{formatTime(Math.floor(currTime / 60))}:{formatTime(Math.floor(currTime % 60))}</span>
-                      <span>{formatTime(Math.floor(duration / 60))}:{formatTime(Math.floor(duration % 60))}</span>
-                    </div>
+                  <div className="flex justify-between text-xs text-gray-400">
+                    <span>
+                      {formatTime(Math.floor(currTime / 60))}:
+                      {formatTime(Math.floor(currTime % 60))}
+                    </span>
+                    <span>
+                      {formatTime(Math.floor(duration / 60))}:
+                      {formatTime(Math.floor(duration % 60))}
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
-          )}
-        </main>
-      </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 };

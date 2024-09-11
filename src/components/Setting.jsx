@@ -19,6 +19,7 @@ const Settings = () => {
   useEffect(() => {
     dispatch(fetchProfile());
   }, [dispatch]);
+
   useEffect(() => {
     const fetchSubscriptions = async () => {
       try {
@@ -37,6 +38,7 @@ const Settings = () => {
     };
     fetchSubscriptions();
   }, []);
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -87,11 +89,10 @@ const Settings = () => {
   // Function to handle password change API call
   const handlePasswordChange = async (oldPassword, newPassword) => {
     try {
-      const response = await apiHelper(
-        "/api/user/changePassword",
-        "POST",
-        { oldPassword, newPassword } // Ensure this object is correct
-      );
+      const response = await apiHelper("/api/user/changePassword", "POST", {
+        oldPassword,
+        newPassword,
+      });
 
       if (response.status === 200) {
         toast.success("Password updated successfully!");
@@ -102,9 +103,9 @@ const Settings = () => {
       toast.error(error.response?.data?.error || "An error occurred.");
     }
   };
+
   const handleSubmitPasswordChange = (values, { resetForm }) => {
     const { oldPassword, newPassword } = values;
-    console.log(values);
     handlePasswordChange(oldPassword, newPassword);
     resetForm();
   };
@@ -128,7 +129,8 @@ const Settings = () => {
         <div className="flex-1 p-4 sm:p-6 text-white">
           <Header />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Referral Section */}
             <div className="bg-white text-black p-4 rounded shadow-md">
               <h2 className="text-xl font-bold mb-4">Exciting Prize!</h2>
               <p className="text-xl font-bold mb-4">
@@ -151,21 +153,21 @@ const Settings = () => {
               <div className="flex flex-col sm:flex-row gap-4 mt-6">
                 <button
                   onClick={handleShareFacebook}
-                  className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded"
+                  className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded  sm:w-auto"
                 >
                   <FaFacebook />
                   Share on Facebook
                 </button>
                 <button
                   onClick={handleShareWhatsApp}
-                  className="flex items-center justify-center gap-2 bg-green-500 text-white px-4 py-2 rounded"
+                  className="flex items-center justify-center gap-2 bg-green-500 text-white px-4 py-2 rounded  sm:w-auto"
                 >
                   <FaWhatsapp />
                   Share on WhatsApp
                 </button>
                 <button
                   onClick={handleCopyLink}
-                  className="flex items-center justify-center gap-2 bg-purple-500 text-white px-4 py-2 rounded"
+                  className="flex items-center justify-center gap-2 bg-purple-500 text-white px-4 py-2 rounded sm:w-auto"
                 >
                   <FaInstagram />
                   Copy Link
@@ -246,98 +248,63 @@ const Settings = () => {
                     </div>
                     <button
                       type="submit"
-                      className="bg-purple-600 text-white px-4 py-2 rounded w-full"
                       disabled={isSubmitting}
+                      className="bg-purple-600 text-white px-4 py-2 rounded "
                     >
-                      Update Password
+                      {isSubmitting ? "Updating..." : "Update Password"}
                     </button>
                   </Form>
                 )}
               </Formik>
             </div>
 
-            {/* My Subscription Section */}
-            <div className="bg-white text-black p-4 rounded shadow-md md:col-span-2">
-              <h2 className="text-xl font-bold mb-4">My Subscription</h2>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead>
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Subscription Name
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Description
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Price
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Start Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        End Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {subscriptions.length > 0 ? (
-                      subscriptions.map((subscription) => (
-                        <tr key={subscription._id}>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {subscription.name}
+            {/* Subscriptions Section */}
+            <div className="bg-white text-black p-4 rounded shadow-md">
+              <h2 className="text-xl font-bold mb-4">Subscriptions</h2>
+              {subscriptions.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full bg-white border-collapse">
+                    <thead>
+                      <tr>
+                        <th className="border-b p-2 text-left">Plan</th>
+                        <th className="border-b p-2 text-left">Start Date</th>
+                        <th className="border-b p-2 text-left">End Date</th>
+                        <th className="border-b p-2 text-left">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {subscriptions.map((sub) => (
+                        <tr key={sub._id}>
+                          <td className="border-b p-2">{sub.name}</td>
+                          <td className="border-b p-2">
+                            {new Date(sub.startDate).toLocaleDateString()}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {subscription.description}
+                          <td className="border-b p-2">
+                            {new Date(sub.endDate).toLocaleDateString()}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            ₹{subscription.price.toFixed(2)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {new Date(
-                              subscription.startDate
-                            ).toLocaleDateString()}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {new Date(
-                              subscription.endDate
-                            ).toLocaleDateString()}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="border-b p-2">
                             <span
                               className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                subscription.status === "active"
+                                sub.status === "active"
                                   ? "bg-green-100 text-green-800"
                                   : "bg-red-100 text-red-800"
                               }`}
                             >
-                              {subscription.status.charAt(0).toUpperCase() +
-                                subscription.status.slice(1)}
+                              {sub.status}
                             </span>
                           </td>
                         </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan="6"
-                          className="px-6 py-4 whitespace-nowrap text-center text-gray-500"
-                        >
-                          No subscriptions found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p>No subscriptions found.</p>
+              )}
             </div>
           </div>
         </div>
       </main>
-
       <ToastContainer />
     </div>
   );

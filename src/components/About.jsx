@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { FaBars } from "react-icons/fa";
+import Header from "./Header";
 
 const About = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -28,11 +29,13 @@ const About = () => {
             <FaBars size={24} />
           </button>
         </header>
-
+        <Header />
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col items-center justify-center p-6">
           <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg text-center mx-4">
-            <h1 className="text-3xl font-bold text-gray-800 mb-4">Pahadi Beats</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-4">
+              Pahadi Beats
+            </h1>
             <p className="text-gray-600 mb-6">
               Discover the perfect music for every occasion with Pahadi Beats,
               available on your phone, computer, tablet, and more. Enjoy a wide
@@ -55,27 +58,30 @@ const About = () => {
               Explore Now
             </Link>
           </div>
-
-          {/* Merchant Information */}
-          <div className="bg-white rounded-lg shadow-lg p-6 mt-8 w-full max-w-lg text-left mx-4">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">About Us</h2>
-            <p className="text-gray-600 mb-2">
+        </div>
+        {/* Footer for Merchant Information */}
+        <footer className="bg-gray-800 text-white p-6 w-full flex justify-center mt-8">
+          <div className="w-full max-w-lg text-left mx-4">
+            <h2 className="text-2xl font-bold mb-4">About Us</h2>
+            <p className="mb-2">
               <strong>Merchant Legal Entity Name:</strong> Sandeep Ghildiyal
             </p>
-            <p className="text-gray-600 mb-2">
-              <strong>Registered Address:</strong> Rishikesh, Rishikesh, Uttarakhand, PIN: 249137
+            <p className="mb-2">
+              <strong>Registered Address:</strong> Rishikesh, Rishikesh,
+              Uttarakhand, PIN: 249137
             </p>
-            <p className="text-gray-600 mb-2">
-              <strong>Operational Address:</strong> Rishikesh, Rishikesh, Uttarakhand, PIN: 249137
+            <p className="mb-2">
+              <strong>Operational Address:</strong> Rishikesh, Rishikesh,
+              Uttarakhand, PIN: 249137
             </p>
-            <p className="text-gray-600 mb-2">
+            <p className="mb-2">
               <strong>Telephone No:</strong> 8077589187
             </p>
-            <p className="text-gray-600 mb-2">
+            <p className="mb-2">
               <strong>E-Mail ID:</strong> beatsofpahad@gmail.com
             </p>
           </div>
-        </div>
+        </footer>
       </main>
     </div>
   );

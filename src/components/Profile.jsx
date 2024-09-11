@@ -325,6 +325,8 @@ const Profile = () => {
                             <Field name="phoneNumber">
                               {({ field, form }) => (
                                 <PhoneInput
+                                  international
+                                  defaultCountry="IN"
                                   placeholder="Phone Number"
                                   className="border border-gray-300 p-3 rounded text-black w-full"
                                   {...field}

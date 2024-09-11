@@ -44,7 +44,7 @@ const AllAlbum = () => {
           </button>
         </header>
        <Header />
-       <div className="flex overflow-x-auto gap-4 p-4">
+       <div className="flex flex-wrap justify-center gap-8 p-6 overflow-visible">
       {albums.map((album) => (
         <div
           key={album._id}

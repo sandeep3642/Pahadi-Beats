@@ -20,7 +20,7 @@ const Search = () => {
   const handleSearchChange = async (e) => {
     const value = e.target.value;
 
-    if (value.length > 2) {
+    if (value.length >= 2) {
       // Fetch suggestions when input length > 2
       await fetchSuggestions(value);
     } else {

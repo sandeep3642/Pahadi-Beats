@@ -127,9 +127,9 @@ const AboutAlbum = () => {
                       {album?.title.toUpperCase()}
                     </h2>
                     <p className="text-md text-gray-400 mt-2">
-                    by {album.artist
-                            ?.map((artist) => artist.name)
-                            .join(", ") || "Unknown Artist"}
+                      by{" "}
+                      {album.artist?.map((artist) => artist.name).join(", ") ||
+                        "Unknown Artist"}
                     </p>
                     <p className="text-md text-gray-400">{album.releaseDate}</p>
                   </div>
@@ -201,19 +201,18 @@ const AboutAlbum = () => {
                   </tbody>
                 </table>
               </div>
-
-              {/* PlayingSong component */}
-              {currentSong && (
-                <PlayingSong
-                  song={currentSong}
-                  playlist={playlist}
-                  currentSongIndex={currentSongIndex}
-                  isPlaying={isPlaying}
-                  onChangeSong={handleChangeSong}
-                  onPlayPause={handlePlayPause}
-                />
-              )}
             </section>
+          )}
+          {/* PlayingSong component */}
+          {currentSong && (
+            <PlayingSong
+              song={currentSong}
+              playlist={playlist}
+              currentSongIndex={currentSongIndex}
+              isPlaying={isPlaying}
+              onChangeSong={handleChangeSong}
+              onPlayPause={handlePlayPause}
+            />
           )}
         </main>
       </div>
