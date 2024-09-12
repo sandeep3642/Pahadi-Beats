@@ -10,6 +10,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import localforage from "localforage";
 import { toast, ToastContainer } from "react-toastify"; // Import toast and ToastContainer from react-toastify
 import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
+import Header from "./Header";
 const AllSongs = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -173,16 +174,18 @@ const AllSongs = () => {
               <FaBars size={24} />
             </button>
           </header>
+          <Header/>
           {loading ? (
             <Spinner />
           ) : (
             <section className="flex-1 bg-purple-1000 p-4 md:p-6 text-white overflow-y-auto">
+              <h2 className="text-3xl font-bold mb-4 text-left ">All Songs</h2>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="text-white">
                     <tr>
-                      <th className="py-2 px-2 md:px-4 text-left"></th>
-                      <th className="py-2 px-2 md:px-4 text-left">Title</th>
+                      <th className="py-2 px-2 md:px-4 text-left">#</th>
+                      <th className="py-2 px-2 md:px-4 text-center">Title</th>
                       <th className="py-2 px-2 md:px-4 text-center hidden md:table-cell">
                         Album Name
                       </th>
@@ -197,7 +200,7 @@ const AllSongs = () => {
                   <tbody className="divide-y divide-gray-700">
                     {songs.map((song, index) => (
                       <tr key={song._id} className="hover:bg-gray-800">
-                        <td className="py-2 px-2 md:px-4 text-white">
+                        <td className="py-2 px-2 md:px-4 text-white text-left">
                           {index + 1}
                         </td>
                         <td className="py-2 px-2 md:px-4 text-white flex items-center">
