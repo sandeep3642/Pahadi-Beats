@@ -131,6 +131,52 @@ const Settings = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Referral Section */}
+
+            {/* Subscriptions Section */}
+            <div className="bg-white text-black p-4 rounded shadow-md">
+              <h2 className="text-xl font-bold mb-4">Subscriptions</h2>
+              {subscriptions.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full bg-white border-collapse">
+                    <thead>
+                      <tr>
+                        <th className="border-b p-2 text-left">Plan</th>
+                        <th className="border-b p-2 text-left">Start Date</th>
+                        <th className="border-b p-2 text-left">End Date</th>
+                        <th className="border-b p-2 text-left">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {subscriptions.map((sub) => (
+                        <tr key={sub._id}>
+                          <td className="border-b p-2">{sub.name}</td>
+                          <td className="border-b p-2">
+                            {new Date(sub.startDate).toLocaleDateString()}
+                          </td>
+                          <td className="border-b p-2">
+                            {new Date(sub.endDate).toLocaleDateString()}
+                          </td>
+                          <td className="border-b p-2">
+                            <span
+                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                sub.status === "active"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                              }`}
+                            >
+                              {sub.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p>No subscriptions found.</p>
+              )}
+            </div>
+
             <div className="bg-white text-black p-4 rounded shadow-md">
               <h2 className="text-xl font-bold mb-4">Exciting Prize!</h2>
               <p className="text-xl font-bold mb-4">
@@ -256,51 +302,6 @@ const Settings = () => {
                   </Form>
                 )}
               </Formik>
-            </div>
-
-            {/* Subscriptions Section */}
-            <div className="bg-white text-black p-4 rounded shadow-md">
-              <h2 className="text-xl font-bold mb-4">Subscriptions</h2>
-              {subscriptions.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full bg-white border-collapse">
-                    <thead>
-                      <tr>
-                        <th className="border-b p-2 text-left">Plan</th>
-                        <th className="border-b p-2 text-left">Start Date</th>
-                        <th className="border-b p-2 text-left">End Date</th>
-                        <th className="border-b p-2 text-left">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {subscriptions.map((sub) => (
-                        <tr key={sub._id}>
-                          <td className="border-b p-2">{sub.name}</td>
-                          <td className="border-b p-2">
-                            {new Date(sub.startDate).toLocaleDateString()}
-                          </td>
-                          <td className="border-b p-2">
-                            {new Date(sub.endDate).toLocaleDateString()}
-                          </td>
-                          <td className="border-b p-2">
-                            <span
-                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                sub.status === "active"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
-                              }`}
-                            >
-                              {sub.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p>No subscriptions found.</p>
-              )}
             </div>
           </div>
         </div>

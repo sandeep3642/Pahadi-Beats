@@ -17,68 +17,51 @@ const PlayingSong = ({ song, playlist, currentSongIndex, isPlaying, onChangeSong
   }, [currentSongIndex, playlist.length, onChangeSong]);
 
   useEffect(() => {
-    // Clean up the previous audio element
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = "";
+    // Initialize or update the audio element when the song URL changes
+    if (!audioRef.current) {
+      audioRef.current = new Audio(song.songUrl);
+    } else if (audioRef.current.src !== song.songUrl) {
+      audioRef.current.src = song.songUrl;
     }
 
-    // Create a new audio element
-    audioRef.current = new Audio(song.songUrl);
-    
     const setAudioData = () => {
       setDuration(audioRef.current.duration);
       setCurrTime({ min: 0, sec: 0 });
     };
 
     const setAudioTime = () => {
-      const min = Math.floor(audioRef.current.currentTime / 60);
-      const sec = Math.floor(audioRef.current.currentTime % 60);
-      setCurrTime({ min, sec });
+      const currentTime = audioRef.current.currentTime;
+      setCurrTime({
+        min: Math.floor(currentTime / 60),
+        sec: Math.floor(currentTime % 60),
+      });
     };
 
     const handleEnded = () => {
       handleNext();
     };
 
-    audioRef.current.addEventListener('loadeddata', setAudioData);
-    audioRef.current.addEventListener('timeupdate', setAudioTime);
-    audioRef.current.addEventListener('ended', handleEnded);
+    // Attach event listeners
+    audioRef.current.addEventListener("loadedmetadata", setAudioData);
+    audioRef.current.addEventListener("timeupdate", setAudioTime);
+    audioRef.current.addEventListener("ended", handleEnded);
 
-    // Start playing if isPlaying is true
+    // Handle play/pause functionality
     if (isPlaying) {
-      audioRef.current.play().catch(error => console.error("Playback failed:", error));
+      audioRef.current.play().catch((error) => console.error("Playback error:", error));
+    } else {
+      audioRef.current.pause();
     }
 
+    // Cleanup on unmount or song change
     return () => {
       if (audioRef.current) {
-        audioRef.current.removeEventListener('loadeddata', setAudioData);
-        audioRef.current.removeEventListener('timeupdate', setAudioTime);
-        audioRef.current.removeEventListener('ended', handleEnded);
-        audioRef.current.pause();
-        audioRef.current.src = "";
+        audioRef.current.removeEventListener("loadedmetadata", setAudioData);
+        audioRef.current.removeEventListener("timeupdate", setAudioTime);
+        audioRef.current.removeEventListener("ended", handleEnded);
       }
     };
-  }, [song, handleNext, isPlaying]);  // Include handleNext and isPlaying in dependencies
-
-  useEffect(() => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.play().catch(error => console.error("Playback failed:", error));
-      } else {
-        audioRef.current.pause();
-      }
-    }
-  }, [isPlaying]);
-
-  const formatTime = (time) => {
-    return time < 10 ? `0${time}` : `${time}`;
-  };
-
-  const totalTime = {
-    min: Math.floor(duration / 60),
-    sec: Math.floor(duration % 60),
-  };
+  }, [song, handleNext, isPlaying]);
 
   const handleSliderChange = (e) => {
     const time = parseFloat(e.target.value);
@@ -86,6 +69,13 @@ const PlayingSong = ({ song, playlist, currentSongIndex, isPlaying, onChangeSong
       audioRef.current.currentTime = time;
       setCurrTime({ min: Math.floor(time / 60), sec: Math.floor(time % 60) });
     }
+  };
+
+  const formatTime = (time) => (time < 10 ? `0${time}` : time);
+
+  const totalTime = {
+    min: Math.floor(duration / 60),
+    sec: Math.floor(duration % 60),
   };
 
   return (
@@ -101,8 +91,6 @@ const PlayingSong = ({ song, playlist, currentSongIndex, isPlaying, onChangeSong
             <h3 className="text-sm md:text-lg font-semibold text-white truncate">
               {song.title}
             </h3>
-            <p className="text-xs md:text-sm text-gray-400 truncate">
-            </p>
           </div>
         </div>
 
@@ -134,7 +122,7 @@ const PlayingSong = ({ song, playlist, currentSongIndex, isPlaying, onChangeSong
         type="range"
         min="0"
         max={duration}
-        value={currTime.min * 60 + currTime.sec}
+        value={audioRef.current?.currentTime || 0}
         className="timeline w-full"
         onChange={handleSliderChange}
       />

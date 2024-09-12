@@ -39,7 +39,6 @@ const Profile = () => {
   };
   const dispatch = useDispatch();
   const { profile, loading } = useSelector((state) => state.profile);
-  // const [isLoading, setIsLoading] = useState(false);
   const [profilePicPreview, setProfilePicPreview] = useState(
     profile?.profilePic
   );
@@ -137,8 +136,8 @@ const Profile = () => {
 
       if (response.status === 200) {
         toast.success("Profile updated successfully!");
-        // Update the profilePicPreview state with the new profile picture URL
         setProfilePicPreview(profile.profilePic);
+        window.location.reload();
       } else {
         toast.error(`Error updating profile: ${response.message}`);
       }
@@ -224,19 +223,16 @@ const Profile = () => {
                               style={{ display: "none" }}
                               id="profilePicInput"
                             />
-                            {profilePicPreview ? (
-                              <img
-                                src={profilePicPreview}
-                                alt="Profile Preview"
-                                className="mt-4 w-24 h-24 md:w-32 md:h-32 rounded-full object-cover"
-                              />
-                            ) : (
-                              <img
-                                src={avatar}
-                                alt="Default Avatar"
-                                className="mt-4 w-24 h-24 md:w-32 md:h-32 rounded-full object-cover"
-                              />
-                            )}
+
+                            <img
+                              src={profile?.profilePic ?? avatar} // Assume profile has a picture field
+                              alt="Profile Preview"
+                              className="mt-4 w-24 h-24 md:w-32 md:h-32 rounded-full object-cover"
+                              onError={() =>
+                                console.log("Error loading profile picture")
+                              }
+                            />
+
                             <FaPencilAlt
                               onClick={() =>
                                 document
