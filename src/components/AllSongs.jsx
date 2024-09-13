@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { FaPlay, FaPause, FaBars } from "react-icons/fa";
-import { IoMdArrowRoundBack, IoMdArrowRoundForward } from "react-icons/io";
 import Sidebar from "./Sidebar";
 import Spinner from "./Spinner";
 import apiHelper from "../utils/apiHelper";
@@ -18,7 +17,7 @@ const AllSongs = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
   const location = useLocation();
-  const  artist  = location.state || ""; // Get artist from location state
+  const artist = location.state || ""; // Get artist from location state
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,13 +35,12 @@ const AllSongs = () => {
       setLoading(true);
       try {
         const data = await apiHelper(
-          `/api/song/getAllSongs?pageNumber=${currentPage}&pageSize=${pageSize}&artist=${artist}`,
+          `/api/song/getAllSongs?artist=${artist}`,
           "GET"
         );
-        if (data && data.data && data.pagination) {
+        if (data && data.data) {
           // Check if data structure is valid
           setSongs(data.data);
-          setTotalPages(Math.ceil(data.pagination.totalSongs / pageSize));
         } else {
           console.error("Unexpected response structure:", data);
         }
@@ -56,11 +54,10 @@ const AllSongs = () => {
     const fetchPlaylist = async () => {
       try {
         const data = await apiHelper(
-          `/api/song/getAllSongs?pageNumber=${currentPage}&pageSize=${pageSize}&artist=${artist}`,
+          `/api/song/getAllSongs?artist=${artist}`,
           "GET"
         );
         setPlaylist(data.data);
-        setTotalPages(Math.ceil(data.pagination.totalSongs / pageSize));
       } catch (error) {
         console.error("Error fetching playlist:", error);
       }
@@ -68,7 +65,7 @@ const AllSongs = () => {
 
     fetchSongs();
     fetchPlaylist();
-  }, [currentPage,artist]);
+  }, [currentPage, artist]);
 
   const handlePlaySong = (song) => {
     if (song && currentSong && currentSong._id === song._id) {
@@ -79,18 +76,6 @@ const AllSongs = () => {
       setCurrentSong(song);
       setCurrentSongIndex(songs.findIndex((s) => s._id === song._id));
       setIsPlaying(true);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
     }
   };
 
@@ -134,7 +119,6 @@ const AllSongs = () => {
         true
       );
       if (response.data) {
-        console.log(typeof response.data, ">>>>>>>>>>>>>>>>>");
         const blob = new Blob([response.data], { type: "audio/mpeg" });
         await localforage.setItem(`song_${songId}`, {
           blob,
@@ -157,8 +141,8 @@ const AllSongs = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      <div className="flex flex-col md:flex-row min-h-screen bg-purple-1000">
+    <div className="flex flex-col h-screen ">
+      <div className="flex flex-col md:flex-row min-h-screen ">
         {/* Sidebar */}
         <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
@@ -174,13 +158,13 @@ const AllSongs = () => {
               <FaBars size={24} />
             </button>
           </header>
-          <Header/>
+          <Header />
           {loading ? (
             <Spinner />
           ) : (
-            <section className="flex-1 bg-purple-1000 p-4 md:p-6 text-white overflow-y-auto">
+            <section className="flex-1 bg-purple-1000 p-4 md:p-6 text-white">
               <h2 className="text-3xl font-bold mb-4 text-left ">All Songs</h2>
-              <div className="overflow-x-auto">
+              <div className="">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="text-white">
                     <tr>
@@ -267,37 +251,19 @@ const AllSongs = () => {
                   </tbody>
                 </table>
               </div>
-
-              <div className="flex justify-center mt-4 space-x-2">
-                <button
-                  onClick={handlePreviousPage}
-                  disabled={currentPage === 1}
-                  className="bg-purple-700 text-white py-2 px-4 rounded-lg hover:bg-purple-900 disabled:opacity-50"
-                >
-                  <IoMdArrowRoundBack />
-                </button>
-                <span className="bg-purple-1000 text-white py-2 px-4 rounded-lg">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <button
-                  onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
-                  className="bg-purple-700 text-white py-2 px-4 rounded-lg hover:bg-purple-900 disabled:opacity-50"
-                >
-                  <IoMdArrowRoundForward />
-                </button>
-              </div>
             </section>
           )}
           {currentSong && (
-            <PlayingSong
-              song={currentSong}
-              playlist={playlist}
-              currentSongIndex={currentSongIndex}
-              isPlaying={isPlaying}
-              onChangeSong={handleChangeSong}
-              onPlayPause={handlePlayPause}
-            />
+            <div className="fixed bottom-0 left-0 right-0">
+              <PlayingSong
+                song={currentSong}
+                playlist={playlist}
+                currentSongIndex={currentSongIndex}
+                isPlaying={isPlaying}
+                onChangeSong={handleChangeSong}
+                onPlayPause={handlePlayPause}
+              />
+            </div>
           )}
         </main>
       </div>

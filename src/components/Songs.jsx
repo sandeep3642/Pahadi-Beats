@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { FaPlay } from "react-icons/fa";
-import { IoMdArrowRoundBack, IoMdArrowRoundForward } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import apiHelper from "../utils/apiHelper";
 
 const Songs = () => {
   const [songs, setSongs] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
   const [pageSize, setPageSize] = useState(getResponsivePageSize());
   const navigate = useNavigate();
 
@@ -16,7 +14,7 @@ const Songs = () => {
     if (window.innerWidth >= 1280) return 6; // Large screens show 6 items
     if (window.innerWidth >= 1024) return 4; // Medium screens show 4 items
     if (window.innerWidth >= 768) return 4; // Small screens show 2 items
-    return 2; // Extra small screens show 2 items
+    return 4; // Extra small screens show 2 items
   }
 
   // Fetch songs whenever currentPage or pageSize changes
@@ -28,7 +26,6 @@ const Songs = () => {
           "GET"
         );
         setSongs(data.data);
-        setTotalPages(Math.ceil(data.pagination.totalSongs / pageSize));
       } catch (error) {
         console.error("Error fetching songs:", error);
       }
@@ -54,22 +51,10 @@ const Songs = () => {
     });
   };
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
   return (
     <>
       <div className="flex overflow-x-auto gap-4 p-4">
-        {songs.map((song) => (
+        {songs.slice(0,6).map((song) => (
           <div
             key={song._id}
             className="relative flex flex-col items-center group p-2 transition-transform transform hover:scale-105"
@@ -96,27 +81,6 @@ const Songs = () => {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Pagination Controls */}
-      <div className="flex justify-center mt-4">
-        <button
-          onClick={handlePreviousPage}
-          disabled={currentPage === 1}
-          className="bg-purple-700 text-white py-2 px-4 rounded-l-lg hover:bg-purple-900"
-        >
-          <IoMdArrowRoundBack />
-        </button>
-        <span className="bg-purple-1000 text-white py-2 px-4">
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={handleNextPage}
-          disabled={currentPage === totalPages}
-          className="bg-purple-700 text-white py-2 px-4 rounded-r-lg hover:bg-purple-900"
-        >
-          <IoMdArrowRoundForward />
-        </button>
       </div>
     </>
   );
