@@ -20,13 +20,10 @@ const AllSongs = () => {
   const artist = location.state || ""; // Get artist from location state
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
   const [playlist, setPlaylist] = useState([]);
   const [currentSong, setCurrentSong] = useState(null);
   const [currentSongIndex, setCurrentSongIndex] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
-  const pageSize = 10;
   const [isSubscribed, setIsSubscribed] = useState(false); // Add subscription state
   const navigate = useNavigate();
 
@@ -65,7 +62,7 @@ const AllSongs = () => {
 
     fetchSongs();
     fetchPlaylist();
-  }, [currentPage, artist]);
+  }, [artist]);
 
   const handlePlaySong = (song) => {
     if (song && currentSong && currentSong._id === song._id) {
