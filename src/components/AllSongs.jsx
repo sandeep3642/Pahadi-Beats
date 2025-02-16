@@ -10,7 +10,11 @@ import localforage from "localforage";
 import { toast, ToastContainer } from "react-toastify"; // Import toast and ToastContainer from react-toastify
 import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
 import Header from "./Header";
+import { useDispatch, useSelector } from "react-redux";
+import { addSong } from "../redux/song.slice";
 const AllSongs = () => {
+  const dispatch = useDispatch()
+  const { currentSong, songIndex ,isPlaying} = useSelector(state => state.song);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
@@ -21,11 +25,10 @@ const AllSongs = () => {
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [playlist, setPlaylist] = useState([]);
-  const [currentSong, setCurrentSong] = useState(null);
-  const [currentSongIndex, setCurrentSongIndex] = useState(-1);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false); // Add subscription state
   const navigate = useNavigate();
+
+
 
   useEffect(() => {
     const fetchSongs = async () => {
@@ -65,25 +68,25 @@ const AllSongs = () => {
   }, [artist]);
 
   const handlePlaySong = (song) => {
-    if (song && currentSong && currentSong._id === song._id) {
-      // Ensure song is defined
-      setIsPlaying(!isPlaying);
-    } else if (song) {
-      // Ensure song is defined
-      setCurrentSong(song);
-      setCurrentSongIndex(songs.findIndex((s) => s._id === song._id));
-      setIsPlaying(true);
+    const currentIdx = songs.findIndex((s) => s._id === song._id);
+    if (currentSong?._id === song._id) {
+      // setIsPlaying(!isPlaying);
+      dispatch(addSong({currentSong:song,songIndex:currentIdx,isPlaying:!isPlaying}))
+    } else {
+      dispatch(addSong({ currentSong: song, songIndex: currentIdx,isPlaying:true }));
+      // setIsPlaying(true);
     }
   };
+  
 
   const handleChangeSong = (newIndex) => {
-    setCurrentSong(playlist[newIndex]);
-    setCurrentSongIndex(newIndex);
-    setIsPlaying(true);
+    dispatch(addSong({ currentSong: playlist[newIndex], songIndex: newIndex,isPlaying:true }))
+  
   };
 
   const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
+    // setIsPlaying(!isPlaying);
+    dispatch(addSong({ currentSong: playlist[songIndex], songIndex: songIndex,isPlaying:!isPlaying }))
   };
 
   useEffect(() => {
@@ -199,11 +202,10 @@ const AllSongs = () => {
                             </p>
                           </div>
                           <button
-                            aria-label={`${
-                              isPlaying && currentSong?._id === song._id
+                            aria-label={`${isPlaying && currentSong?._id === song._id
                                 ? "Pause"
                                 : "Play"
-                            } ${song.title}`}
+                              } ${song.title}`}
                             className="ml-2 md:ml-4 text-purple-400 hover:text-purple-600"
                             onClick={() => handlePlaySong(song)}
                           >
@@ -253,15 +255,16 @@ const AllSongs = () => {
           {currentSong && (
             <div className="fixed bottom-0 left-0 right-0">
               <PlayingSong
-                song={currentSong}
+                currentSong={currentSong}
+                songIndex={songIndex}
                 playlist={playlist}
-                currentSongIndex={currentSongIndex}
                 isPlaying={isPlaying}
                 onChangeSong={handleChangeSong}
                 onPlayPause={handlePlayPause}
               />
             </div>
           )}
+
         </main>
       </div>
       {loading && <Spinner />} {/* Show spinner when loading */}

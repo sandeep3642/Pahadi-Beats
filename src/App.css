@@ -6,7 +6,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  cursor: pointer;
 }
 
 /* Ensures that the background covers the full height and allows for scrolling content */
@@ -16,12 +16,10 @@ body {
   min-height: 100vh; /* Ensure the app container takes at least full viewport height */
   color: white; /* White text */
   flex-direction: column;
-  overflow: auto; /* Allows content to scroll if needed */
 }
 
 /* If your app needs a global scroll behavior */
 html, body {
   height: 100%; /* Set full height for both html and body */
-  overflow-y: scroll; /* Ensure vertical scroll is visible when needed */
 
 }

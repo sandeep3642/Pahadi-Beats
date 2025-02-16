@@ -1,39 +1,49 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FaPlay, FaPause, FaStepBackward, FaStepForward } from "react-icons/fa";
 
-const PlayingSong = ({ song, playlist, currentSongIndex, isPlaying, onChangeSong, onPlayPause }) => {
+let globalAudio = new Audio(); // Persist audio instance globally
+
+const PlayingSong = ({ currentSong, songIndex, playlist, isPlaying, onChangeSong, onPlayPause }) => {
   const [currTime, setCurrTime] = useState({ min: 0, sec: 0 });
   const [duration, setDuration] = useState(0);
-  const audioRef = useRef(null);
+
+  console.log("playlist",playlist,songIndex);
+  
 
   const handlePrevious = useCallback(() => {
-    const newIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
+    if (songIndex===null || songIndex===undefined) return;
+    const newIndex = (songIndex - 1 + playlist.length) % playlist.length;
     onChangeSong(newIndex);
-  }, [currentSongIndex, playlist.length, onChangeSong]);
+  }, [songIndex, playlist.length, onChangeSong]);
 
   const handleNext = useCallback(() => {
-    const newIndex = (currentSongIndex + 1) % playlist.length;
+    if (songIndex===null || songIndex===undefined) return;
+    const newIndex = (songIndex + 1) % playlist.length;
     onChangeSong(newIndex);
-  }, [currentSongIndex, playlist.length, onChangeSong]);
+  }, [songIndex, playlist.length, onChangeSong]);
 
   useEffect(() => {
-    // Initialize or update the audio element when the song URL changes
-    if (!audioRef.current) {
-      audioRef.current = new Audio(song.songUrl);
-    } else if (audioRef.current.src !== song.songUrl) {
-      audioRef.current.src = song.songUrl;
+    if (!currentSong) return;
+
+    console.log("currentSong",currentSong);
+    
+
+    // If a new song is selected, update the source
+    if (globalAudio.src !== currentSong?.songUrl) {
+      globalAudio.pause();
+      globalAudio.src = currentSong?.songUrl;
+      globalAudio.load(); // Reload new source
     }
 
     const setAudioData = () => {
-      setDuration(audioRef.current.duration);
+      setDuration(globalAudio.duration);
       setCurrTime({ min: 0, sec: 0 });
     };
 
     const setAudioTime = () => {
-      const currentTime = audioRef.current.currentTime;
       setCurrTime({
-        min: Math.floor(currentTime / 60),
-        sec: Math.floor(currentTime % 60),
+        min: Math.floor(globalAudio.currentTime / 60),
+        sec: Math.floor(globalAudio.currentTime % 60),
       });
     };
 
@@ -41,55 +51,43 @@ const PlayingSong = ({ song, playlist, currentSongIndex, isPlaying, onChangeSong
       handleNext();
     };
 
-    // Attach event listeners
-    audioRef.current.addEventListener("loadedmetadata", setAudioData);
-    audioRef.current.addEventListener("timeupdate", setAudioTime);
-    audioRef.current.addEventListener("ended", handleEnded);
+    globalAudio.addEventListener("loadedmetadata", setAudioData);
+    globalAudio.addEventListener("timeupdate", setAudioTime);
+    globalAudio.addEventListener("ended", handleEnded);
 
-    // Handle play/pause functionality
     if (isPlaying) {
-      audioRef.current.play().catch((error) => console.error("Playback error:", error));
+      globalAudio.play().catch((error) => console.error("Playback error:", error));
     } else {
-      audioRef.current.pause();
+      globalAudio.pause();
     }
 
-    // Cleanup on unmount or song change
     return () => {
-      if (audioRef.current) {
-        audioRef.current.removeEventListener("loadedmetadata", setAudioData);
-        audioRef.current.removeEventListener("timeupdate", setAudioTime);
-        audioRef.current.removeEventListener("ended", handleEnded);
-      }
+      globalAudio.removeEventListener("loadedmetadata", setAudioData);
+      globalAudio.removeEventListener("timeupdate", setAudioTime);
+      globalAudio.removeEventListener("ended", handleEnded);
     };
-  }, [song, handleNext, isPlaying]);
+  }, [currentSong, handleNext, isPlaying]);
 
   const handleSliderChange = (e) => {
     const time = parseFloat(e.target.value);
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-      setCurrTime({ min: Math.floor(time / 60), sec: Math.floor(time % 60) });
-    }
+    globalAudio.currentTime = time;
+    setCurrTime({ min: Math.floor(time / 60), sec: Math.floor(time % 60) });
   };
 
   const formatTime = (time) => (time < 10 ? `0${time}` : time);
-
-  const totalTime = {
-    min: Math.floor(duration / 60),
-    sec: Math.floor(duration % 60),
-  };
 
   return (
     <div className="bg-gray-800 shadow-lg">
       <div className="playing-song flex flex-col md:flex-row items-center justify-between p-2 w-full max-w-full mx-auto">
         <div className="flex items-center mb-2 md:mb-0">
           <img
-            src={song.album?.coverImage || song?.coverImage}
+            src={currentSong?.album?.coverImage || currentSong?.coverImage}
             alt="Now playing cover art"
             className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg mr-2 md:mr-4"
           />
           <div className="song-details">
             <h3 className="text-sm md:text-lg font-semibold text-white truncate">
-              {song.title}
+              {currentSong?.title}
             </h3>
           </div>
         </div>
@@ -102,11 +100,7 @@ const PlayingSong = ({ song, playlist, currentSongIndex, isPlaying, onChangeSong
             onClick={() => onPlayPause(!isPlaying)}
             className="bg-purple-500 text-white rounded-full p-2 md:p-3 focus:outline-none hover:bg-purple-600"
           >
-            {isPlaying ? (
-              <FaPause className="w-4 h-4 md:w-6 md:h-6" />
-            ) : (
-              <FaPlay className="w-4 h-4 md:w-6 md:h-6" />
-            )}
+            {isPlaying ? <FaPause className="w-4 h-4 md:w-6 md:h-6" /> : <FaPlay className="w-4 h-4 md:w-6 md:h-6" />}
           </button>
           <button onClick={handleNext} className="control-button text-white">
             <FaStepForward className="w-4 h-4 md:w-5 md:h-5" />
@@ -114,7 +108,9 @@ const PlayingSong = ({ song, playlist, currentSongIndex, isPlaying, onChangeSong
         </div>
 
         <div className="time-display text-white flex items-center text-xs md:text-sm mt-2 md:mt-0">
-          <span>{`${formatTime(currTime.min)}:${formatTime(currTime.sec)} / ${formatTime(totalTime.min)}:${formatTime(totalTime.sec)}`}</span>
+          <span>{`${formatTime(currTime.min)}:${formatTime(currTime.sec)} / ${formatTime(
+            Math.floor(duration / 60)
+          )}:${formatTime(Math.floor(duration % 60))}`}</span>
         </div>
       </div>
 
@@ -122,7 +118,7 @@ const PlayingSong = ({ song, playlist, currentSongIndex, isPlaying, onChangeSong
         type="range"
         min="0"
         max={duration}
-        value={audioRef.current?.currentTime || 0}
+        value={globalAudio.currentTime || 0}
         className="timeline w-full"
         onChange={handleSliderChange}
       />

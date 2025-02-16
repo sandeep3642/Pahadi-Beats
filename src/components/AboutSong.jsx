@@ -10,21 +10,23 @@ import localforage from "localforage";
 import { toast, ToastContainer } from "react-toastify"; // Import toast and ToastContainer from react-toastify
 import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
 import PlayingSong from "./PlayingSong";
+import { useDispatch, useSelector } from "react-redux";
+import { addSong } from "../redux/song.slice";
 const AboutSong = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
+  const { currentSong, songIndex, isPlaying } = useSelector(state => state.song);
+
 
   const location = useLocation();
   const { songId } = location.state || {}; // Get songId from location state
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [currentSong, setCurrentSong] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [recommendedSong, setRecommendedSong] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isSubscribed, setIsSubscribed] = useState(false); // Example subscription state
   const [playlist, setPlaylist] = useState([]);
-  const [currentSongIndex, setCurrentSongIndex] = useState(null);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -40,20 +42,10 @@ const AboutSong = () => {
         );
 
         if (data && data.data) {
-          setCurrentSong(data.data.song);
+          dispatch(addSong({ currentSong: data.data.song, songIndex: 0, isPlaying: true }));
           setRecommendedSong(data.data.recommendedSongs); // Update recommended songs
           setTotalPages(data.pagination.totalPages); // Update total pages
           setPlaylist(data.data.recommendedSongs || []); // Update playlist
-
-          // Automatically play the song when fetched
-          if (data.data.song) {
-            setIsPlaying(true);
-            setCurrentSongIndex(
-              data.data.recommendedSongs.findIndex(
-                (s) => s._id === data.data.song._id
-              )
-            );
-          }
         }
       } catch (error) {
         console.error("Error fetching song:", error);
@@ -67,13 +59,11 @@ const AboutSong = () => {
     }
   }, [songId, currentPage]);
 
-  const handlePlaySong = (song) => {
+  const handlePlaySong = (song, index) => {
     if (song && currentSong && currentSong._id === song._id) {
-      setIsPlaying(!isPlaying);
-    } else if (song) {
-      setCurrentSong(song);
-      setCurrentSongIndex(playlist.findIndex((s) => s._id === song._id));
-      setIsPlaying(true);
+      dispatch(addSong({ currentSong: song, songIndex: index, isPlaying: !isPlaying }));
+    } else {
+      dispatch(addSong({ currentSong: song, songIndex: index, isPlaying: true }));
     }
   };
 
@@ -91,13 +81,11 @@ const AboutSong = () => {
   };
 
   const handleChangeSong = (newIndex) => {
-    setCurrentSong(playlist[newIndex]);
-    setCurrentSongIndex(newIndex);
-    setIsPlaying(true);
+    dispatch(addSong({ currentSong: playlist[newIndex], songIndex: newIndex, isPlaying: true }))
   };
 
   const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
+    dispatch(addSong({ currentSong: playlist[songIndex], songIndex: songIndex, isPlaying: !isPlaying }))
   };
 
   useEffect(() => {
@@ -175,7 +163,7 @@ const AboutSong = () => {
         ) : (
           <section className="flex-1 bg-purple-1000 p-4 md:p-6 text-white overflow-y-auto">
             <div className="overflow-x-auto">
-                <h1 className="text-white text-left text-3xl">Recommended Songs </h1>
+              <h1 className="text-white text-left text-3xl">Recommended Songs </h1>
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="text-white">
                   <tr>
@@ -214,13 +202,12 @@ const AboutSong = () => {
                             </p>
                           </div>
                           <button
-                            aria-label={`${
-                              isPlaying && currentSong?._id === song._id
-                                ? "Pause"
-                                : "Play"
-                            } ${song.title}`}
+                            aria-label={`${isPlaying && currentSong?._id === song._id
+                              ? "Pause"
+                              : "Play"
+                              } ${song.title}`}
                             className="ml-2 md:ml-4 text-purple-400 hover:text-purple-600"
-                            onClick={() => handlePlaySong(song)}
+                            onClick={() => handlePlaySong(song, index)}
                           >
                             {isPlaying && currentSong?._id === song._id ? (
                               <FaPause className="w-4 h-4 md:w-5 md:h-5" />
@@ -283,9 +270,9 @@ const AboutSong = () => {
         )}
         {currentSong && (
           <PlayingSong
-            song={currentSong}
+            currentSong={currentSong}
+            songIndex={songIndex}
             playlist={playlist}
-            currentSongIndex={currentSongIndex}
             isPlaying={isPlaying}
             onChangeSong={handleChangeSong}
             onPlayPause={handlePlayPause}

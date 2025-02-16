@@ -10,20 +10,22 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "./Header";
 import { MdFileDownload, MdLock } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
+import { addSong } from "../redux/song.slice";
 
 const AboutAlbum = () => {
   const { id } = useParams();
   const [album, setAlbum] = useState(null);
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentSong, setCurrentSong] = useState(null);
-  const [currentSongIndex, setCurrentSongIndex] = useState(-1);
   const [playlist, setPlaylist] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false); // Add subscription state
   const navigate = useNavigate();
-
+  const dispatch = useDispatch()
+  const { currentSong, songIndex,isPlaying } = useSelector(state => state.song);
+  console.log("currentSong",currentSong,songIndex);
+  
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -47,23 +49,30 @@ const AboutAlbum = () => {
   }, [id]);
 
   const handlePlaySong = (song, index) => {
+
     if (song && currentSong && currentSong._id === song._id) {
-      setIsPlaying(!isPlaying);
+      // setIsPlaying(!isPlaying);
+      dispatch(addSong({ currentSong: song, songIndex: index,isPlaying:!isPlaying }));
     } else {
-      setCurrentSong(song);
-      setCurrentSongIndex(index);
-      setIsPlaying(true);
+      dispatch(addSong({ currentSong: song, songIndex: index,isPlaying:true }));
+
+      // setCurrentSong(song);
+      // setCurrentSongIndex(index);
+      // setIsPlaying(true);
     }
   };
 
   const handleChangeSong = (newIndex) => {
-    setCurrentSong(playlist[newIndex]);
-    setCurrentSongIndex(newIndex);
-    setIsPlaying(true);
+        dispatch(addSong({ currentSong: playlist[newIndex], songIndex: newIndex ,isPlaying:true}))
+    
+    // setCurrentSong(playlist[newIndex]);
+    // setCurrentSongIndex(newIndex);
+    // setIsPlaying(true);
   };
 
   const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
+    // setIsPlaying(!isPlaying);
+    dispatch(addSong({ currentSong: playlist[songIndex], songIndex: songIndex ,isPlaying:!isPlaying}))
   };
 
   const handleDownload = async (songId, songTitle) => {
@@ -205,7 +214,7 @@ const AboutAlbum = () => {
                                 : "Play"
                             } ${song.title}`}
                             className="ml-2 md:ml-4 text-purple-400 hover:text-purple-600"
-                            onClick={() => handlePlaySong(song)}
+                            onClick={() => handlePlaySong(song,index)}
                           >
                             {isPlaying && currentSong?._id === song._id ? (
                               <FaPause className="w-4 h-4 md:w-5 md:h-5" />
@@ -254,14 +263,14 @@ const AboutAlbum = () => {
           )}
           {/* PlayingSong component */}
           {currentSong && (
-            <PlayingSong
-              song={currentSong}
-              playlist={playlist}
-              currentSongIndex={currentSongIndex}
-              isPlaying={isPlaying}
-              onChangeSong={handleChangeSong}
-              onPlayPause={handlePlayPause}
-            />
+             <PlayingSong
+             currentSong={currentSong}
+             songIndex={songIndex}
+             playlist={playlist}
+             isPlaying={isPlaying}
+             onChangeSong={handleChangeSong}
+             onPlayPause={handlePlayPause}
+           />
           )}
           <ToastContainer />
         </main>
